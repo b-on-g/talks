@@ -1,0 +1,5 @@
+$bog_talks_message_bubble $hyoo_talks_message_bubble
+	message $bog_talks_message
+	author $bog_talks_person
+	Author $bog_talks_person_avatar
+		person <= author

@@ -1,0 +1,4 @@
+deploy \/bog/talks/logo/logo.svg
+deploy \/bog/talks/manifest.json
+
+include \/mol/offline/install

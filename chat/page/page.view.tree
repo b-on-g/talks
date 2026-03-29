@@ -1,0 +1,6 @@
+$bog_talks_chat_page $hyoo_talks_chat_page
+	chat $bog_talks_chat
+	messages?val /$bog_talks_message
+	message!id $bog_talks_message
+	Bubble!id $bog_talks_message_bubble
+		message <= message!id
