@@ -1,0 +1,17 @@
+{
+	"name": "Bog Talks",
+	"short_name": "Talks",
+	"description": "",
+	"id": "bog_talks",
+	"start_url": "../..",
+	"display": "standalone",
+	"background_color": "#000000",
+	"theme_color": "#000000",
+	"icons": [
+		{
+			"src": "../../bog/talks/logo/logo.svg",
+			"type": "image/svg+xml",
+			"sizes": "512x512"
+		}
+	]
+}
