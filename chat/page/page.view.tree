@@ -4,3 +4,24 @@ $bog_talks_chat_page $hyoo_talks_chat_page
 	message!id $bog_talks_message
 	Bubble!id $bog_talks_message_bubble
 		message <= message!id
+	Rights $giper_baza_land_rights
+	rights_panel /
+	tools /
+		<= Rights_link $mol_pick
+			hint @ \Invite members
+			trigger_content /
+				<= Rights_icon $mol_icon_account_plus
+			bubble_content <= rights_panel
+		<= Dump $mol_button_download
+			hint @ \Download all messages
+			file_name <= dump_name \chat.сsv
+			blob <= dump_blob?val null
+		<= Joined $mol_check_icon
+			hint @ \Joined
+			Icon <= Joined_icon $mol_icon_eye
+			checked?val <=> joined?val false
+		<= Search_toggle $mol_check_icon
+			hint @ \Toggle search
+			Icon <= Search_toggle_icon $mol_icon_magnify
+			checked?val <=> search_enabled?val false
+		<= Close null

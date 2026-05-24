@@ -1,2 +1,9 @@
 $bog_talks_person_settings $hyoo_talks_person_settings
 	person $bog_talks_person
+	body /
+		<= Form
+		<= Pass_field $mol_form_field
+			name @ \Pass key (share to be invited)
+			control <= Pass_key $mol_string
+				value <= pass_key \
+				enabled false

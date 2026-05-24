@@ -4,7 +4,7 @@ namespace $ {
 		Text: $giper_baza_atom_text,
 	}) {
 
-		get id() { return this.land_link().str as $mol_int62_string }
+		get id() { return this.link().str as $mol_int62_string }
 
 		state(): $hyoo_crowd_struct {
 			throw new Error( 'Use Giper Baza API' )

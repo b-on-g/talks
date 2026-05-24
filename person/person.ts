@@ -65,7 +65,7 @@ namespace $ {
 
 			if( next !== undefined ) {
 				const atom = dict.key( key, null )
-				if( atom ) atom.vary( next?.land_link() ?? null )
+				if( atom ) atom.vary( next?.link() ?? null )
 				return next ?? null
 			}
 
