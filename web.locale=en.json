@@ -1,4 +1,9 @@
 {
+	"$bog_talks_chat_page_Dump_hint": "Download all messages",
+	"$bog_talks_chat_page_Joined_hint": "Joined",
+	"$bog_talks_chat_page_Rights_link_hint": "Invite members",
+	"$bog_talks_chat_page_Search_toggle_hint": "Toggle search",
+	"$bog_talks_person_settings_Pass_field_name": "Pass key (share to be invited)",
 	"$giper_baza_flex_field_Link_new_dictionary_deny": "🔐 Private",
 	"$giper_baza_flex_field_Link_new_dictionary_local": "💼 Local",
 	"$giper_baza_flex_field_Link_new_dictionary_post": "✍ All post",
