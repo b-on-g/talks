@@ -779,7 +779,7 @@ var $;
         'color': 'gray',
     });
     $.$mol_dev_format_indent = $.$mol_dev_format_div.bind(null, {
-        'margin-left': '13px'
+        'margin-inline-start': '13px'
     });
     class Stack extends Array {
         // [ Symbol.toPrimitive ]() {
@@ -2084,12 +2084,12 @@ var $;
                 reuse: if (existen) {
                     if (!existen.temp)
                         break reuse;
-                    if (existen.task !== task) {
-                        cause = 'task';
-                        break reuse;
-                    }
                     if (existen.host !== host) {
                         cause = 'host';
+                        break reuse;
+                    }
+                    if (existen.task !== task) {
+                        cause = 'task';
                         break reuse;
                     }
                     if (!$mol_compare_deep(existen.args, args)) {
@@ -3550,7 +3550,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $mol_style_attach("mol/view/view/view.css", "@view-transition {\n\tnavigation: auto;\n}\n\n[mol_view] {\n\ttransition-property: height, width, min-height, min-width, max-width, max-height, transform, scale, translate, rotate;\n\ttransition-duration: .2s;\n\ttransition-timing-function: ease-out;\n\t-webkit-appearance: none;\n\tbox-sizing: border-box;\n\tdisplay: flex;\n\tflex-shrink: 0;\n\tcontain: style;\n\tscrollbar-color: var(--mol_theme_line) transparent;\n\tscrollbar-width: thin;\n}\t\n\n[mol_view]::selection {\n\tbackground: var(--mol_theme_line);\n}\t\n\n[mol_view]::-webkit-scrollbar {\n\twidth: .25rem;\n\theight: .25rem;\n}\n\n[mol_view]::-webkit-scrollbar-corner {\n\tbackground-color: var(--mol_theme_line);\n}\n\n[mol_view]::-webkit-scrollbar-track {\n\tbackground-color: transparent;\n}\n\n[mol_view]::-webkit-scrollbar-thumb {\n\tbackground-color: var(--mol_theme_line);\n\tborder-radius: var(--mol_gap_round);\n}\n\n[mol_view] > * {\n\tword-break: inherit;\n}\n\n[mol_view_root] {\n\tmargin: 0;\n\tpadding: 0;\n\twidth: 100%;\n\theight: 100%;\n\tbox-sizing: border-box;\n\tfont-family: system-ui, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n\tfont-size: 1rem;\n\tline-height: 1.5rem;\n\t/* background: var(--mol_theme_back);\n\tcolor: var(--mol_theme_text); */\n\tcontain: unset; /** Fixes bg ignoring when applied to body on Chrome */\n\ttab-size: 4;\n\t/*overscroll-behavior: contain; /** Disable navigation gestures **/\n}\n\n@media print {\n\t[mol_view_root] {\n\t\theight: auto;\n\t}\n}\n[mol_view][mol_view_error]:not([mol_view_error=\"Promise\"], [mol_view_error=\"$mol_promise_blocker\"]) {\n\tbackground-image: repeating-linear-gradient(\n\t\t-45deg,\n\t\t#f92323,\n\t\t#f92323 .5rem,\n\t\t#ff3d3d .5rem,\n\t\t#ff3d3d 1.5rem\n\t);\n\tcolor: black;\n\talign-items: center;\n\tjustify-content: center;\n}\n\n@keyframes mol_view_wait {\n\tfrom {\n\t\topacity: .25;\n\t}\n\t20% {\n\t\topacity: .75;\n\t}\n\tto {\n\t\topacity: .25;\n\t}\n}\n\n:where([mol_view][mol_view_error=\"$mol_promise_blocker\"]),\n:where([mol_view][mol_view_error=\"Promise\"]) {\n\tbackground: var(--mol_theme_hover);\n}\n\n[mol_view][mol_view_error=\"Promise\"] {\n\tanimation: mol_view_wait 1s steps(20,end) infinite;\n}\n");
+    $mol_style_attach("mol/view/view/view.css", "@view-transition {\n\tnavigation: auto;\n}\n\n[mol_view] {\n\ttransition-property: height, width, min-height, min-width, max-width, max-height, transform, scale, translate, rotate;\n\ttransition-duration: .2s;\n\ttransition-timing-function: ease-out;\n\t-webkit-appearance: none;\n\tbox-sizing: border-box;\n\tdisplay: flex;\n\tflex-shrink: 0;\n\tcontain: style;\n\tscrollbar-color: var(--mol_theme_line) transparent;\n\tscrollbar-width: thin;\n\ttext-wrap-style: pretty;\n\tunicode-bidi: plaintext\n}\n\n[mol_view]::selection {\n\tbackground: var(--mol_theme_line);\n}\t\n\n[mol_view]::-webkit-scrollbar {\n\twidth: .25rem;\n\theight: .25rem;\n}\n\n[mol_view]::-webkit-scrollbar-corner {\n\tbackground-color: var(--mol_theme_line);\n}\n\n[mol_view]::-webkit-scrollbar-track {\n\tbackground-color: transparent;\n}\n\n[mol_view]::-webkit-scrollbar-thumb {\n\tbackground-color: var(--mol_theme_line);\n\tborder-radius: var(--mol_gap_round);\n}\n\n[mol_view] > * {\n\tword-break: inherit;\n}\n\n[mol_view_root] {\n\tmargin: 0;\n\tpadding: 0;\n\twidth: 100%;\n\theight: 100%;\n\tbox-sizing: border-box;\n\tfont-family: system-ui, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n\tfont-size: 1rem;\n\tline-height: 1.5rem;\n\t/* background: var(--mol_theme_back);\n\tcolor: var(--mol_theme_text); */\n\tcontain: unset; /** Fixes bg ignoring when applied to body on Chrome */\n\ttab-size: 4;\n\t/*overscroll-behavior: contain; /** Disable navigation gestures **/\n}\n\n@media print {\n\t[mol_view_root] {\n\t\theight: auto;\n\t}\n}\n[mol_view][mol_view_error]:not([mol_view_error=\"Promise\"], [mol_view_error=\"$mol_promise_blocker\"]) {\n\tbackground-image: repeating-linear-gradient(\n\t\t-45deg,\n\t\t#f92323,\n\t\t#f92323 .5rem,\n\t\t#ff3d3d .5rem,\n\t\t#ff3d3d 1.5rem\n\t);\n\tcolor: black;\n\talign-items: center;\n\tjustify-content: center;\n}\n\n@keyframes mol_view_wait {\n\tfrom {\n\t\topacity: .25;\n\t}\n\t20% {\n\t\topacity: .75;\n\t}\n\tto {\n\t\topacity: .25;\n\t}\n}\n\n:where([mol_view][mol_view_error=\"$mol_promise_blocker\"]),\n:where([mol_view][mol_view_error=\"Promise\"]) {\n\tbackground: var(--mol_theme_hover);\n}\n\n[mol_view][mol_view_error=\"Promise\"] {\n\tanimation: mol_view_wait 1s steps(20,end) infinite;\n}\n");
 })($ || ($ = {}));
 
 ;
@@ -4520,7 +4520,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $mol_style_attach("mol/book2/book2.view.css", "[mol_book2] {\n\tdisplay: flex;\n\tflex-flow: row nowrap;\n\talign-items: stretch;\n\tflex: 1 1 auto;\n\talign-self: stretch;\n\tmargin: 0;\n\t/* box-shadow: 0 0 0 1px var(--mol_theme_line); */\n\t/* transform: translateZ(0); */\n\ttransition: none;\n\tscroll-snap-type: x mandatory;\n\t/* padding: 0 1px;\n\tscroll-padding: 0 1px;\n\tgap: 1px; */\n}\n\n[mol_book2] > * {\n/* \tflex: none; */\n\tscroll-snap-stop: always;\n\tscroll-snap-align: end;\n\tposition: relative;\n\tmin-height: 100%;\n\tmax-height: 100%;\n\tmax-width: 100%;\n\tflex-shrink: 0;\n\tbox-shadow: inset 0 0 0 1px var(--mol_theme_field);\n}\n\n[mol_book2] > *:not(:first-of-type):before,\n[mol_book2] > *:not(:last-of-type)::after {\n\tcontent: '';\n\tposition: absolute;\n\ttop: 1.5rem;\n\twidth: 3px;\n\theight: 1rem;\n\tbackground: linear-gradient(\n\t\tto bottom,\n\t\tvar(--mol_theme_special) 0%,\n\t\tvar(--mol_theme_special) 14%,\n\t\ttransparent 15%,\n\t\ttransparent 42%,\n\t\tvar(--mol_theme_special) 43%,\n\t\tvar(--mol_theme_special) 57%,\n\t\ttransparent 58%,\n\t\ttransparent 85%,\n\t\tvar(--mol_theme_special) 86%,\n\t\tvar(--mol_theme_special) 100%\n\t);\n\topacity: .5;\n\tz-index: var(--mol_layer_speck);\n}\n[mol_book2] > *:not(:first-of-type):before {\n\tleft: -3px;\n}\n[mol_book2] > *:not(:last-of-type)::after {\n\tright: -3px;\n}\n\n:where([mol_book2]) > * {\n\tbackground-color: var(--mol_theme_card);\n\t/* box-shadow: 0 0 0 1px var(--mol_theme_back); */\n}\n\n[mol_book2] > [mol_book2] {\n\tdisplay: contents;\n}\n\n[mol_book2] > *:first-child {\n\tscroll-snap-align: start;\n}\n\n[mol_book2] > [mol_view] {\n\ttransform: none; /* prevent content clipping */\n}\n\n[mol_book2_placeholder] {\n\tflex: 1 1 0;\n\tbackground: none;\n}\n\n[mol_book2_gap] {\n\tbackground: none;\n\tflex-grow: 1;\n\tscroll-snap-align: none;\n\tmargin-right: -1px;\n\tbox-shadow: none;\n}\n\n[mol_book2_gap]::before,\n[mol_book2_gap]::after {\n\tdisplay: none;\n}\n");
+    $mol_style_attach("mol/book2/book2.view.css", "[mol_book2] {\n\tdisplay: flex;\n\tflex-flow: row nowrap;\n\talign-items: stretch;\n\tflex: 1 1 auto;\n\talign-self: stretch;\n\tmargin: 0;\n\t/* box-shadow: 0 0 0 1px var(--mol_theme_line); */\n\t/* transform: translateZ(0); */\n\ttransition: none;\n\tscroll-snap-type: x mandatory;\n\t/* padding: 0 1px;\n\tscroll-padding: 0 1px;\n\tgap: 1px; */\n}\n\n[mol_book2] > * {\n/* \tflex: none; */\n\tscroll-snap-stop: always;\n\tscroll-snap-align: end;\n\tposition: relative;\n\tmin-height: 100%;\n\tmax-height: 100%;\n\tmax-width: 100%;\n\tflex-shrink: 0;\n\tbox-shadow: inset 0 0 0 1px var(--mol_theme_field);\n}\n\n[mol_book2] > *:not(:first-of-type):before,\n[mol_book2] > *:not(:last-of-type)::after {\n\tcontent: '';\n\tposition: absolute;\n\ttop: 1.5rem;\n\twidth: 3px;\n\theight: 1rem;\n\tbackground: linear-gradient(\n\t\tto bottom,\n\t\tvar(--mol_theme_special) 0%,\n\t\tvar(--mol_theme_special) 14%,\n\t\ttransparent 15%,\n\t\ttransparent 42%,\n\t\tvar(--mol_theme_special) 43%,\n\t\tvar(--mol_theme_special) 57%,\n\t\ttransparent 58%,\n\t\ttransparent 85%,\n\t\tvar(--mol_theme_special) 86%,\n\t\tvar(--mol_theme_special) 100%\n\t);\n\topacity: .5;\n\tz-index: var(--mol_layer_speck);\n}\n[mol_book2] > *:not(:first-of-type):before {\n\tleft: -3px;\n}\n[mol_book2] > *:not(:last-of-type)::after {\n\tright: -3px;\n}\n\n:where([mol_book2]) > * {\n\tbackground-color: var(--mol_theme_card);\n\t/* box-shadow: 0 0 0 1px var(--mol_theme_back); */\n}\n\n[mol_book2] > [mol_book2] {\n\tdisplay: contents;\n}\n\n[mol_book2] > *:first-child {\n\tscroll-snap-align: start;\n}\n\n[mol_book2] > [mol_view] {\n\ttransform: none; /* prevent content clipping */\n}\n\n[mol_book2_placeholder] {\n\tflex: 1 1 0;\n\tbackground: none;\n}\n\n[mol_book2_gap] {\n\tbackground: none;\n\tflex-grow: 1;\n\tscroll-snap-align: none;\n\tmargin-inline-end: -1px;\n\tbox-shadow: none;\n}\n\n[mol_book2_gap]::before,\n[mol_book2_gap]::after {\n\tdisplay: none;\n}\n");
 })($ || ($ = {}));
 
 ;
@@ -6267,6 +6267,9 @@ var $;
         static lang(next) {
             return this.$.$mol_state_local.value('locale', next) || $mol_dom_context.navigator.language.replace(/-.*/, '') || this.lang_default();
         }
+        static direction() {
+            return new Intl.Locale(this.lang()).getTextInfo().direction ?? 'ltr';
+        }
         static source(lang) {
             return JSON.parse(this.$.$mol_file.relative(`web.locale=${lang}.json`).text().toString());
         }
@@ -6307,6 +6310,9 @@ var $;
     __decorate([
         $mol_mem
     ], $mol_locale, "lang", null);
+    __decorate([
+        $mol_mem
+    ], $mol_locale, "direction", null);
     __decorate([
         $mol_mem_key
     ], $mol_locale, "source", null);
@@ -7157,7 +7163,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $mol_style_attach("mol/string/string.view.css", "[mol_string] {\n\tbox-sizing: border-box;\n\toutline-offset: 0;\n\tborder: none;\n\tborder-radius: var(--mol_gap_round);\n\twhite-space: pre-line;\n\toverflow: hidden;\n\ttext-overflow: ellipsis;\n\tpadding: var(--mol_gap_text);\n\ttext-align: left;\n\tposition: relative;\n\tfont: inherit;\n\tflex: 1 1 auto;\n\tbackground: transparent;\n\tmin-width: 0;\n\tcolor: inherit;\n\tbackground: var(--mol_theme_field);\n}\n\n[mol_string]:disabled:not(:placeholder-shown) {\n\tbackground-color: transparent;\n\tcolor: var(--mol_theme_text);\n}\n\n[mol_string]:where(:not(:disabled)) {\n\tbox-shadow: inset 0 0 0 1px var(--mol_theme_line);\n}\n\n[mol_string]:where(:not(:disabled)):hover {\n\tbox-shadow: inset 0 0 0 2px var(--mol_theme_line);\n\tz-index: var(--mol_layer_hover);\n}\n\n[mol_string]:focus {\n\toutline: none;\n\tz-index: var(--mol_layer_focus);\n\tcolor: var(--mol_theme_text);\n\tbox-shadow: inset 0 0 0 1px var(--mol_theme_focus);\n}\n\n[mol_string]::placeholder {\n\tcolor: var(--mol_theme_shade);\n}\n\n[mol_string]::-ms-clear {\n\tdisplay: none;\n}\n");
+    $mol_style_attach("mol/string/string.view.css", "[mol_string] {\n\tbox-sizing: border-box;\n\toutline-offset: 0;\n\tborder: none;\n\tborder-radius: var(--mol_gap_round);\n\twhite-space: pre-line;\n\toverflow: hidden;\n\ttext-overflow: ellipsis;\n\tpadding: var(--mol_gap_text);\n\ttext-align: start;\n\tposition: relative;\n\tfont: inherit;\n\tflex: 1 1 auto;\n\tbackground: transparent;\n\tmin-width: 0;\n\tcolor: inherit;\n\tbackground: var(--mol_theme_field);\n}\n\n[mol_string]:disabled:not(:placeholder-shown) {\n\tbackground-color: transparent;\n\tcolor: var(--mol_theme_text);\n}\n\n[mol_string]:where(:not(:disabled)) {\n\tbox-shadow: inset 0 0 0 1px var(--mol_theme_line);\n}\n\n[mol_string]:where(:not(:disabled)):hover {\n\tbox-shadow: inset 0 0 0 2px var(--mol_theme_line);\n\tz-index: var(--mol_layer_hover);\n}\n\n[mol_string]:focus {\n\toutline: none;\n\tz-index: var(--mol_layer_focus);\n\tcolor: var(--mol_theme_text);\n\tbox-shadow: inset 0 0 0 1px var(--mol_theme_focus);\n}\n\n[mol_string]::placeholder {\n\tcolor: var(--mol_theme_shade);\n}\n\n[mol_string]::-ms-clear {\n\tdisplay: none;\n}\n");
 })($ || ($ = {}));
 
 ;
@@ -7436,7 +7442,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $mol_style_attach("mol/list/list.view.css", "[mol_list] {\n\twill-change: contents;\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-shrink: 0;\n\tmax-width: 100%;\n\t/* display: flex;\n\talign-items: stretch;\n\talign-content: stretch; */\n\ttransition: none;\n\tmin-height: 1.5rem;\n\t/* will-change: contents; */\n}\n\n[mol_list_gap_before] ,\n[mol_list_gap_after] {\n\tdisplay: block !important;\n\tflex: none;\n\ttransition: none;\n\toverflow-anchor: none;\n}\n");
+    $mol_style_attach("mol/list/list.view.css", "[mol_list] {\n\twill-change: contents;\n\tdisplay: flex;\n\tflex-direction: column;\n\tflex-shrink: 0;\n\tmax-width: 100%;\n\t/* display: flex;\n\talign-items: stretch;\n\talign-content: stretch; */\n\ttransition: none;\n\t/* will-change: contents; */\n}\n\n[mol_list]:where([mol_view_error]) {\n\tmin-height: 1.5rem;\n}\n\n[mol_list_gap_before] ,\n[mol_list_gap_after] {\n\tdisplay: block !important;\n\tflex: none;\n\ttransition: none;\n\toverflow-anchor: none;\n}\n");
 })($ || ($ = {}));
 
 ;
@@ -8161,7 +8167,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $mol_style_attach("mol/search/search.view.css", "[mol_search] {\n\talign-self: flex-start;\n\tflex: auto;\n}\n\n[mol_search_anchor] {\n\tflex: 1 1 auto;\n}\n\n[mol_search_query] {\n\tflex-grow: 1;\n}\n\n[mol_search_menu] {\n\tmin-height: .75rem;\n\tdisplay: flex;\n}\n\n[mol_search_suggest] {\n\ttext-align: left;\n}\n\n[mol_search_suggest_label_high] {\n\tcolor: var(--mol_theme_shade);\n\ttext-shadow: none;\n}\n");
+    $mol_style_attach("mol/search/search.view.css", "[mol_search] {\n\talign-self: flex-start;\n\tflex: auto;\n}\n\n[mol_search_anchor] {\n\tflex: 1 1 auto;\n}\n\n[mol_search_query] {\n\tflex-grow: 1;\n}\n\n[mol_search_menu] {\n\tmin-height: .75rem;\n\tdisplay: flex;\n}\n\n[mol_search_suggest] {\n\ttext-align: start;\n}\n\n[mol_search_suggest_label_high] {\n\tcolor: var(--mol_theme_shade);\n\ttext-shadow: none;\n}\n");
 })($ || ($ = {}));
 
 ;
@@ -10231,7 +10237,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $mol_style_attach("mol/check/check.css", "[mol_check] {\n\tflex: 0 0 auto;\n\tjustify-content: flex-start;\n\talign-content: center;\n\t/* align-items: flex-start; */\n\tborder: none;\n\tfont-weight: inherit;\n\tbox-shadow: none;\n\ttext-align: left;\n\tdisplay: inline-flex;\n\tflex-wrap: nowrap;\n}\n\n[mol_check_title] {\n\tflex-shrink: 1;\n}\n");
+    $mol_style_attach("mol/check/check.css", "[mol_check] {\n\tflex: 0 0 auto;\n\tjustify-content: flex-start;\n\talign-content: center;\n\t/* align-items: flex-start; */\n\tborder: none;\n\tfont-weight: inherit;\n\tbox-shadow: none;\n\ttext-align: start;\n\tdisplay: inline-flex;\n\tflex-wrap: nowrap;\n}\n\n[mol_check_title] {\n\tflex-shrink: 1;\n}\n");
 })($ || ($ = {}));
 
 ;
@@ -10616,7 +10622,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $mol_style_attach("mol/select/select.view.css", "[mol_select] {\n\tdisplay: flex;\n\tword-break: normal;\n\talign-self: flex-start;\n}\n\n[mol_select_option_row] {\n\tmin-width: 100%;\n\tpadding: 0;\n\tjustify-content: flex-start;\n}\n\n[mol_select_filter] {\n\tflex: 1 0 auto;\n\talign-self: stretch;\n}\n\n[mol_select_option_label] {\n\tpadding: var(--mol_gap_text);\n\ttext-align: left;\n\tmin-height: 1.5em;\n\tdisplay: block;\n\twhite-space: nowrap;\n}\n\n[mol_select_clear_option_content] {\n\tpadding: .5em 1rem .5rem 0;\n\ttext-align: left;\n\tbox-shadow: var(--mol_theme_line);\n\tflex: 1 0 auto;\n}\n\n[mol_select_no_options] {\n\tpadding: var(--mol_gap_text);\n\ttext-align: left;\n\tdisplay: block;\n\tcolor: var(--mol_theme_shade);\n}\n\n[mol_select_trigger] {\n\tpadding: 0;\n\tflex: 1 1 auto;\n\tdisplay: flex;\n}\n\n[mol_select_trigger] > * {\n\tmargin-right: -1rem;\n}\n\n[mol_select_trigger] > *:last-child {\n\tmargin-right: 0;\n}\n\n[mol_select_menu] {\n\tdisplay: flex;\n\tflex-direction: column;\n}\n\n");
+    $mol_style_attach("mol/select/select.view.css", "[mol_select] {\n\tdisplay: flex;\n\tword-break: normal;\n\talign-self: flex-start;\n}\n\n[mol_select_option_row] {\n\tmin-width: 100%;\n\tpadding: 0;\n\tjustify-content: flex-start;\n}\n\n[mol_select_filter] {\n\tflex: 1 0 auto;\n\talign-self: stretch;\n}\n\n[mol_select_option_label] {\n\tpadding: var(--mol_gap_text);\n\ttext-align: start;\n\tmin-height: 1.5em;\n\tdisplay: block;\n\twhite-space: nowrap;\n}\n\n[mol_select_clear_option_content] {\n\tpadding: .5em 1rem .5rem 0;\n\ttext-align: start;\n\tbox-shadow: var(--mol_theme_line);\n\tflex: 1 0 auto;\n}\n\n[mol_select_no_options] {\n\tpadding: var(--mol_gap_text);\n\ttext-align: start;\n\tdisplay: block;\n\tcolor: var(--mol_theme_shade);\n}\n\n[mol_select_trigger] {\n\tpadding: 0;\n\tflex: 1 1 auto;\n\tdisplay: flex;\n}\n\n[mol_select_trigger] > * {\n\tmargin-inline-end: -1rem;\n}\n\n[mol_select_trigger] > *:last-child {\n\tmargin-inline-end: 0;\n}\n\n[mol_select_menu] {\n\tdisplay: flex;\n\tflex-direction: column;\n}\n\n");
 })($ || ($ = {}));
 
 ;
@@ -10748,6 +10754,9 @@ var $;
 		uri_toggle(){
 			return "";
 		}
+		uri_unsafe(){
+			return (this.uri_toggle());
+		}
 		hint(){
 			return "";
 		}
@@ -10791,7 +10800,7 @@ var $;
 		attr(){
 			return {
 				...(super.attr()), 
-				"href": (this.uri_toggle()), 
+				"href": (this.uri_unsafe()), 
 				"title": (this.hint_safe()), 
 				"target": (this.target()), 
 				"download": (this.file_name()), 
@@ -10811,6 +10820,85 @@ var $;
 	};
 	($mol_mem(($.$mol_link.prototype), "event_click"));
 
+
+;
+"use strict";
+var $;
+(function ($) {
+    function $mol_dom_safe_uri(uri) {
+        return uri.replace(/^(?=\w+script+:)/, 'about:blank#');
+    }
+    $.$mol_dom_safe_uri = $mol_dom_safe_uri;
+    function $mol_dom_safe_attr(val) {
+        return val;
+    }
+    $.$mol_dom_safe_attr = $mol_dom_safe_attr;
+    $.$mol_dom_safe_rules = {
+        // defaults
+        '': { id: $mol_dom_safe_attr },
+        // special
+        a: { href: $mol_dom_safe_uri },
+        img: { src: $mol_dom_safe_uri },
+        object: { src: $mol_dom_safe_uri },
+        // blocks
+        div: {},
+        p: {},
+        h1: {},
+        h2: {},
+        h3: {},
+        h4: {},
+        h5: {},
+        h6: {},
+        blockquote: {},
+        pre: {},
+        ul: {},
+        ol: {},
+        li: {},
+        details: {},
+        summary: {},
+        hr: {},
+        table: {},
+        tr: {},
+        td: {},
+        // inlines
+        span: {},
+        strong: {},
+        em: {},
+        br: {},
+        ins: {},
+        del: {},
+        code: {},
+    };
+    function $mol_dom_safe(nodes) {
+        const res = [];
+        for (const node of nodes) {
+            if (node.nodeType === node.TEXT_NODE) {
+                res.push(node);
+                continue;
+            }
+            if (node.nodeType === node.ELEMENT_NODE) {
+                const kids = this.$mol_dom_safe([...node.childNodes]);
+                const allowed = this.$mol_dom_safe_rules[node.localName];
+                if (!allowed) {
+                    res.push(...kids);
+                    continue;
+                }
+                for (const attr of [...node.attributes]) {
+                    const proc = allowed[attr.localName] ?? this.$mol_dom_safe_rules[''][attr.localName];
+                    if (proc)
+                        attr.nodeValue = proc(attr.nodeValue);
+                    else
+                        node.removeAttribute(attr.nodeName);
+                }
+                $mol_dom_render_children(node, kids);
+                res.push(node);
+                continue;
+            }
+        }
+        return res;
+    }
+    $.$mol_dom_safe = $mol_dom_safe;
+})($ || ($ = {}));
 
 ;
 "use strict";
@@ -10880,6 +10968,9 @@ var $;
                         return '💥' + error.message;
                     return '';
                 }
+            }
+            uri_unsafe() {
+                return $mol_dom_safe_uri(super.uri_unsafe());
             }
         }
         __decorate([
@@ -11754,14 +11845,14 @@ var $;
                     funcs.push(this.patterns[token]);
                 return str;
             });
-            return this.patterns[pattern] = (arg) => {
-                return funcs.reduce((res, func) => res + func(arg), '');
+            return this.patterns[pattern] = (arg, lang) => {
+                return funcs.reduce((res, func) => res + func(arg, lang), '');
             };
         }
-        toString(pattern) {
+        toString(pattern, lang) {
             const Base = this.constructor;
             const formatter = Base.formatter(pattern);
-            return formatter(this);
+            return formatter(this, lang);
         }
     }
     $.$mol_time_base = $mol_time_base;
@@ -12169,8 +12260,8 @@ var $;
         }
         valueOf() { return this.native.getTime(); }
         toJSON() { return this.toString(); }
-        toString(pattern = 'YYYY-MM-DDThh:mm:ss.sssZ') {
-            return super.toString(pattern);
+        toString(pattern = 'YYYY-MM-DDThh:mm:ss.sssZ', lang) {
+            return super.toString(pattern, lang);
         }
         toArray() {
             return [this.year, this.month, this.day, this.hour, this.minute, this.second, this.offset?.count('PT1m')];
@@ -12180,6 +12271,12 @@ var $;
         }
         [$mol_dev_format_head]() {
             return $mol_dev_format_span({}, $mol_dev_format_native(this), ' ', $mol_dev_format_accent(this.toString('YYYY-MM-DD hh:mm:ss.sss Z')));
+        }
+        static formatters = {};
+        static intl(lang, pattern, options) {
+            const group = this.formatters[lang ?? ''] ?? (this.formatters[lang ?? ''] = {});
+            group[pattern] = group[pattern] ?? new Intl.DateTimeFormat(lang, options);
+            return group[pattern];
         }
         /// Mnemonics:
         ///  * single letter for numbers: M - month number, D - day of month.
@@ -12203,12 +12300,12 @@ var $;
                     return '';
                 return String(moment.year % 100);
             },
-            'Month': (pattern => (moment) => {
+            'Month': (moment, lang) => {
                 if (moment.month == null)
                     return '';
-                return pattern.format(moment.native);
-            })(new Intl.DateTimeFormat(undefined, { month: 'long' })),
-            'DD Month': (pattern => (moment) => {
+                return $mol_time_moment.intl(lang, 'Month', { month: 'long' }).format(moment.native);
+            },
+            'DD Month': (moment, lang) => {
                 if (moment.month == null) {
                     if (moment.day == null) {
                         return '';
@@ -12219,14 +12316,14 @@ var $;
                 }
                 else {
                     if (moment.day == null) {
-                        return $mol_time_moment.patterns['Month'](moment);
+                        return $mol_time_moment.patterns['Month'](moment, lang);
                     }
                     else {
-                        return pattern.format(moment.native);
+                        return $mol_time_moment.intl(lang, 'DD Month', { day: '2-digit', month: 'long' }).format(moment.native);
                     }
                 }
-            })(new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'long' })),
-            'D Month': (pattern => (moment) => {
+            },
+            'D Month': (moment, lang) => {
                 if (moment.month == null) {
                     if (moment.day == null) {
                         return '';
@@ -12240,16 +12337,16 @@ var $;
                         return $mol_time_moment.patterns['Month'](moment);
                     }
                     else {
-                        return pattern.format(moment.native);
+                        return $mol_time_moment.intl(lang, 'D Month', { day: 'numeric', month: 'long' }).format(moment.native);
                     }
                 }
-            })(new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'long' })),
-            'Mon': (pattern => (moment) => {
+            },
+            'Mon': (moment, lang) => {
                 if (moment.month == null)
                     return '';
-                return pattern.format(moment.native);
-            })(new Intl.DateTimeFormat(undefined, { month: 'short' })),
-            'DD Mon': (pattern => (moment) => {
+                return $mol_time_moment.intl(lang, 'Mon', { month: 'short' }).format(moment.native);
+            },
+            'DD Mon': (moment, lang) => {
                 if (moment.month == null) {
                     if (moment.day == null) {
                         return '';
@@ -12260,14 +12357,14 @@ var $;
                 }
                 else {
                     if (moment.day == null) {
-                        return $mol_time_moment.patterns['Mon'](moment);
+                        return $mol_time_moment.patterns['Mon'](moment, lang);
                     }
                     else {
-                        return pattern.format(moment.native);
+                        return $mol_time_moment.intl(lang, 'DD Mon', { day: '2-digit', month: 'short' }).format(moment.native);
                     }
                 }
-            })(new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short' })),
-            'D Mon': (pattern => (moment) => {
+            },
+            'D Mon': (moment, lang) => {
                 if (moment.month == null) {
                     if (moment.day == null) {
                         return '';
@@ -12278,13 +12375,13 @@ var $;
                 }
                 else {
                     if (moment.day == null) {
-                        return $mol_time_moment.patterns['Mon'](moment);
+                        return $mol_time_moment.patterns['Mon'](moment, lang);
                     }
                     else {
-                        return pattern.format(moment.native);
+                        return $mol_time_moment.intl(lang, 'D Mon', { day: 'numeric', month: 'short' }).format(moment.native);
                     }
                 }
-            })(new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' })),
+            },
             '-MM': (moment) => {
                 if (moment.month == null)
                     return '';
@@ -12300,24 +12397,24 @@ var $;
                     return '';
                 return String(moment.month + 1);
             },
-            'WeekDay': (pattern => (moment) => {
+            'WeekDay': (moment, lang) => {
                 if (moment.day == null)
                     return '';
                 if (moment.month == null)
                     return '';
                 if (moment.year == null)
                     return '';
-                return pattern.format(moment.native);
-            })(new Intl.DateTimeFormat(undefined, { weekday: 'long' })),
-            'WD': (pattern => (moment) => {
+                return $mol_time_moment.intl(lang, 'WeekDay', { weekday: 'long' }).format(moment.native);
+            },
+            'WD': (moment, lang) => {
                 if (moment.day == null)
                     return '';
                 if (moment.month == null)
                     return '';
                 if (moment.year == null)
                     return '';
-                return pattern.format(moment.native);
-            })(new Intl.DateTimeFormat(undefined, { weekday: 'short' })),
+                return $mol_time_moment.intl(lang, 'WD', { weekday: 'short' }).format(moment.native);
+            },
             '-DD': (moment) => {
                 if (moment.day == null)
                     return '';
@@ -13151,7 +13248,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $mol_style_attach("mol/labeler/labeler.view.css", "[mol_labeler] {\n\tdisplay: flex;\n\tflex-direction: column;\n\talign-items: stretch;\n\tcursor: inherit;\n}\n\n[mol_labeler_label] {\n\tmin-height: 2rem;\n\tcolor: var(--mol_theme_shade);\n\tpadding: .5rem .75rem 0;\n\tgap: 0 var(--mol_gap_block);\n\tflex-wrap: wrap;\n}\n\n[mol_labeler_content] {\n\tdisplay: flex;\n\tpadding: var(--mol_gap_text);\n\tmin-height: 2.5rem;\n}\n");
+    $mol_style_attach("mol/labeler/labeler.view.css", "[mol_labeler] {\n\tdisplay: flex;\n\tflex-direction: column;\n\talign-items: stretch;\n\tcursor: inherit;\n}\n\n[mol_labeler_label] {\n\tmin-height: 2rem;\n\tcolor: var(--mol_theme_shade);\n\tpadding: 0;\n\tpadding-top: .5rem;\n\tpadding-inline: .75rem;\n\tgap: 0 var(--mol_gap_block);\n\tflex-wrap: wrap;\n}\n\n[mol_labeler_content] {\n\tdisplay: flex;\n\tpadding: var(--mol_gap_text);\n\tmin-height: 2.5rem;\n}\n");
 })($ || ($ = {}));
 
 ;
@@ -13160,6 +13257,9 @@ var $;
 
 ;
 	($.$mol_form_field) = class $mol_form_field extends ($.$mol_labeler) {
+		state(){
+			return null;
+		}
 		name(){
 			return "";
 		}
@@ -13173,6 +13273,9 @@ var $;
 		}
 		control(){
 			return null;
+		}
+		attr(){
+			return {...(super.attr()), "mol_form_field_state": (this.state())};
 		}
 		bids(){
 			return [];
@@ -13201,6 +13304,9 @@ var $;
          * @see https://mol.hyoo.ru/#!section=demos/demo=mol_form_demo
          */
         class $mol_form_field extends $.$mol_form_field {
+            state() {
+                return this.bid() ? 'bid' : null;
+            }
             bid() {
                 return this.bids().filter(Boolean)[0] ?? '';
             }
@@ -14177,7 +14283,7 @@ var $;
         'spoiler': /^((?:(?:[\?] )(?:[^]*?)$(\r?\n?))+)([\n\r]*)/,
         'header': /^([#=]+)(\s+)(.*?)$([\n\r]*)/,
         'list': /^((?:(?: ?([*+-])|(?:\d+[\.\)])+) +(?:[^]*?)$(?:\r?\n?)(?:  (?:[^]*?)$(?:\r?\n?))*)+)((?:\r?\n)*)/,
-        'code': /^(```\s*)([\w.-]*)[\r\n]+([^]*?)^(```)$([\n\r]*)/,
+        'code': /^(```)([\w.-]*)[\r\n]+([^]*?)^(```)$([\n\r]*)/,
         'code-indent': /^((?:(?: |\t)(?:[^]*?)$\r?\n?)+)([\n\r]*)/,
         'table': /((?:^\|.+?$\r?\n?)+)([\n\r]*)/,
         'grid': /((?:^ *! .*?$\r?\n?)+)([\n\r]*)/,
@@ -14352,11 +14458,11 @@ var $;
                 family: 'monospace',
             },
             Numb: {
-                textAlign: 'right',
+                textAlign: 'end',
                 color: $mol_theme.shade,
                 width: rem(3),
                 margin: {
-                    left: rem(-4),
+                    inlineStart: '-4rem',
                 },
                 display: 'inline-block',
                 whiteSpace: 'nowrap',
@@ -14703,7 +14809,7 @@ var $;
                     true: {
                         $mol_text_code_line: {
                             margin: {
-                                left: rem(1.75),
+                                inlineStart: '1.75rem',
                             },
                         },
                     },
@@ -17088,6 +17194,12 @@ var $;
                 this.setFloat64(offset, next, true);
             return this.getFloat64(offset, true);
         }
+        mix(mixin) {
+            const arr = this.asArray();
+            for (let i = 0; i < mixin.length; ++i)
+                arr[i % arr.byteLength] ^= mixin[i];
+            return this;
+        }
         /** A Uint8Array view for the same buffer. */
         asArray() {
             return new Uint8Array(this.buffer, this.byteOffset, this.byteLength);
@@ -17345,8 +17457,122 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    /** @deprecated Use $mol_crypto2_hash */
-    $.$mol_crypto_hash = $mol_crypto2_hash;
+    class $mol_memo_key extends $mol_wrapper {
+        static wrap(task) {
+            const store = new WeakMap();
+            const fun = function (key, next) {
+                let store2 = store.get(this ?? fun);
+                if (!store2)
+                    store.set(this ?? fun, store2 = new Map);
+                const key_str = $mol_key(key);
+                if (next === undefined && store2.has(key_str))
+                    return store2.get(key_str);
+                const val = task.call(this, key, next) ?? next;
+                store2.set(key_str, val);
+                return val;
+            };
+            Reflect.defineProperty(fun, 'name', { value: task.name + ' ' });
+            return fun;
+        }
+    }
+    $.$mol_memo_key = $mol_memo_key;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    class $mol_schema_any extends Object {
+        static [Symbol.toStringTag];
+        static [$mol_key_handle]() {
+            return this.toString();
+        }
+        /** Short user-readable identity. */
+        static toString() {
+            return $$.$mol_func_name(this);
+        }
+        /** Type-predicate that checks value by schema. */
+        static check(value) {
+            try {
+                this.guard(value);
+                return true;
+            }
+            catch (error) {
+                return false;
+            }
+        }
+        /** `instanceof` support */
+        static [Symbol.hasInstance](value) {
+            return this.check(value);
+        }
+        /** Type-parser that fails of wrong values. */
+        static guard(value) {
+            return value;
+        }
+        /** Type-caster that normalizes wrong values. */
+        static cast(value) {
+            try {
+                this.guard(value);
+                return value;
+            }
+            catch (error) {
+                return this.default;
+            }
+        }
+        /** Default value which conforms schema. */
+        static default = null;
+    }
+    $.$mol_schema_any = $mol_schema_any;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    $.$mol_schema_maybe = $mol_memo_key.func(function $mol_schema_maybe(Some) {
+        return class $mol_schema_maybe_ extends $mol_schema_any {
+            static Some = Some;
+            static toString() {
+                if (this !== $mol_schema_maybe_)
+                    return super.toString();
+                return '$mol_schema_maybe<' + $mol_key(Some) + '>';
+            }
+            static guard(value) {
+                if (value == null)
+                    return value;
+                return Some.guard(value);
+            }
+            static default = null;
+        };
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    $.$mol_schema_instance = $mol_memo_key.func(function $mol_schema_instance(Class) {
+        class $mol_schema_instance_ extends $mol_schema_any {
+            static Class = Class;
+            static toString() {
+                if (this !== $mol_schema_instance_)
+                    return super.toString();
+                return '$mol_schema_instance<' + $$.$mol_func_name(Class) + '>';
+            }
+            static guard(value) {
+                if (value != null && Object(value) instanceof Class)
+                    return value;
+                return $mol_fail(new TypeError('Wrong class', { cause: { value, schema: this } }));
+            }
+            static cast(value) {
+                return this.guard(value);
+            }
+            static default;
+        }
+        return ((Class?.[Symbol.hasInstance] === $mol_schema_any[Symbol.hasInstance])
+            ? Class
+            : $mol_schema_instance_);
+    });
 })($ || ($ = {}));
 
 ;
@@ -17425,7 +17651,7 @@ var $;
             let link = this._hash_cache.get(bin);
             if (link)
                 return link;
-            const hash = $mol_crypto_hash(bin);
+            const hash = $mol_crypto2_hash(bin);
             link = this.from_bin(new Uint8Array(hash.buffer, 0, 12));
             this._hash_cache.set(bin, link);
             return link;
@@ -17481,10 +17707,9 @@ var $;
         mix(mixin) {
             if (mixin instanceof $giper_baza_link)
                 mixin = mixin.toBin();
-            const mix = this.toBin().slice();
-            for (let i = 0; i < mix.length; ++i)
-                mix[i] ^= mixin[i];
-            return mix;
+            const mixout = $mol_buffer.from(this.toBin().slice());
+            mixout.mix(mixin);
+            return mixout.asArray();
         }
     }
     $.$giper_baza_link = $giper_baza_link;
@@ -17500,6 +17725,7 @@ var $;
         }
     }
     $.$giper_baza_link_base = $giper_baza_link_base;
+    $.$giper_baza_link_schema = $mol_schema_maybe($mol_schema_instance($giper_baza_link));
 })($ || ($ = {}));
 
 ;
@@ -17857,9 +18083,9 @@ var $;
         static grab() {
             if (this.embryos.length)
                 return this.from(this.embryos.pop());
-            return $mol_wire_sync(this).generate();
+            return $mol_wire_sync(this)._generate();
         }
-        static async generate() {
+        static async _generate() {
             for (let i = 0; i < 4096; ++i) {
                 const auth = this.from(await super.generate());
                 if (auth.uint8(0) !== 0xFF)
@@ -18303,9 +18529,14 @@ var $;
             if (this.time < time) {
                 this.time = time;
                 this.tick = tick;
+                return true;
             }
             else if (this.time === time && this.tick < tick) {
                 this.tick = tick;
+                return true;
+            }
+            else {
+                return false;
             }
         }
         sync_summ(summ) {
@@ -18332,6 +18563,7 @@ var $;
     class $giper_baza_face_map extends Map {
         /** Cumulative face for all peers. */
         stat = new $giper_baza_face;
+        _peer_last = '';
         constructor(entries) {
             super();
             if (entries)
@@ -18351,7 +18583,9 @@ var $;
         }
         /** Update last time for peer. */
         peer_time(peer, time, tick) {
-            this.stat.sync_time(time, tick);
+            if (this.stat.sync_time(time, tick)) {
+                this._peer_last = peer;
+            }
             let prev = this.get(peer);
             if (prev)
                 prev.sync_time(time, tick);
@@ -18371,15 +18605,19 @@ var $;
             this.peer_summ(peer, (this.get(peer)?.summ ?? 0) + diff);
         }
         /** Generates new time for peer that greater then other seen. */
-        tick() {
+        tick(peer) {
             const now = $giper_baza_time_now();
             if (this.stat.time < now) {
                 this.stat.time = now;
                 this.stat.tick = 0;
             }
+            else if (this._peer_last !== peer.str) {
+                this.stat.time += 1;
+                this.stat.tick = 0;
+                this._peer_last = peer.str;
+            }
             else {
-                this.stat.tick += 1;
-                this.stat.tick %= 2 ** 16;
+                this.stat.tick = (this.stat.tick + 1) % 2 ** 16;
                 if (!this.stat.tick)
                     ++this.stat.time;
             }
@@ -18985,7 +19223,7 @@ var $;
         let page_offset = 0;
         const read_code = () => {
             let code = buffer[pos++];
-            if (code > 0x80)
+            if (code >= 0x80)
                 code = ((mode + code) & 0x7F) | 0x80;
             return code;
         };
@@ -19001,17 +19239,23 @@ var $;
             let code = read_code();
             if (code < full_mode) { // Char Code
                 if (mode === tiny_mode) {
-                    if (code > 0x80) {
+                    if (code >= 0x80) {
                         code = diacr_set[code - 0x080] | (6 << 7);
                     }
                 }
                 else if (!ascii_map[code]) {
                     if (code >= 0x80)
                         code = ascii_set[code - 0x80];
-                    if (mode < tiny_mode)
+                    if (mode < tiny_mode) {
+                        if (pos === buffer.length)
+                            $mol_fail(new Error('Expected 2 bytes', { cause: { text, pos: pos - 1 } }));
                         code |= read_remap() << 7;
-                    if (mode === full_mode)
+                    }
+                    if (mode === full_mode) {
+                        if (pos === buffer.length)
+                            $mol_fail(new Error('Expected 3 bytes', { cause: { text, pos: pos - 2 } }));
                         code |= read_remap() << 14;
+                    }
                     code += page_offset;
                 }
                 text += String.fromCodePoint(code);
@@ -19267,7 +19511,7 @@ var $;
                 const offset = offsets.get(val);
                 if (offset !== undefined)
                     return dump_unum($mol_vary_tip.link, offset);
-                const len_max = val.length * 3;
+                const len_max = val.length * 3 + 2;
                 const len_size = calc_size(len_max);
                 acquire(len_max);
                 const len = $mol_charset_ucf_encode_to(val, this.array, pos + len_size);
@@ -19672,6 +19916,16 @@ var $;
 "use strict";
 var $;
 (function ($) {
+    // export let $giper_baza_vary_schema = $mol_schema_some([
+    // 	$mol_schema_boolean, $mol_schema_float, $mol_schema_bigint, $mol_schema_string,
+    // 	Uint8Array, Uint16Array, Uint32Array, BigUint64Array,
+    // 	Int8Array, Int16Array, Int32Array, BigInt64Array,
+    // 	Float64Array, Float32Array, Float64Array,
+    // 	$mol_time_moment, $mol_time_duration, $mol_time_interval,
+    // 	$mol_tree2, $giper_baza_link, Element,
+    // 	$mol_schema_list( ()=> $giper_baza_vary_schema ),
+    // 	$mol_schema_dict([ ()=> $giper_baza_vary_schema, ()=> $giper_baza_vary_schema ]),
+    // ].map( klass => $mol_schema_instance( klass ) )
     $.$giper_baza_vary = $mol_vary.zone();
     $.$giper_baza_vary.type({
         type: $giper_baza_link,
@@ -19703,455 +19957,6 @@ var $;
         lean: obj => [$$.$mol_tree2_to_string(obj)],
         rich: ([str]) => $$.$mol_tree2_from_string(str),
     });
-    function $giper_baza_vary_switch(vary, ways) {
-        if (vary === null)
-            return ways.none(vary);
-        switch (typeof vary) {
-            case "boolean": return ways.bool(vary);
-            case "bigint": return ways.bint(vary);
-            case "number": return ways.real(vary);
-            case "string": return ways.text(vary);
-        }
-        if (ArrayBuffer.isView(vary))
-            return ways.blob(vary);
-        switch (Reflect.getPrototypeOf(vary)) {
-            case Object.prototype: return ways.dict(vary);
-            case Array.prototype: return ways.list(vary);
-            case $giper_baza_link.prototype: return ways.link(vary);
-            case $mol_time_moment.prototype: return ways.time(vary);
-            case $mol_time_duration.prototype: return ways.dura(vary);
-            case $mol_time_interval.prototype: return ways.span(vary);
-            case $mol_tree2.prototype: return ways.tree(vary);
-        }
-        if (vary instanceof $mol_dom_context.Element)
-            return ways.elem(vary);
-        return $mol_fail(new TypeError(`Unsupported vary type`, { cause: { vary } }));
-    }
-    $.$giper_baza_vary_switch = $giper_baza_vary_switch;
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($) {
-    function $mol_tree2_bin_to_bytes(tree) {
-        return Uint8Array.from(tree.kids, kid => parseInt(kid.value, 16));
-    }
-    $.$mol_tree2_bin_to_bytes = $mol_tree2_bin_to_bytes;
-    function $mol_tree2_bin_from_bytes(bytes, span = $mol_span.unknown) {
-        return $mol_tree2.list(Array.from(bytes, code => {
-            return $mol_tree2.data(code.toString(16).padStart(2, '0'), [], span);
-        }), span);
-    }
-    $.$mol_tree2_bin_from_bytes = $mol_tree2_bin_from_bytes;
-    function $mol_tree2_bin_from_string(str, span = $mol_span.unknown) {
-        return $mol_tree2_bin_from_bytes([...new TextEncoder().encode(str)], span);
-    }
-    $.$mol_tree2_bin_from_string = $mol_tree2_bin_from_string;
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($) {
-    function $mol_tree2_xml_from_dom(dom) {
-        switch (dom.nodeType) {
-            case dom.DOCUMENT_NODE: {
-                let kids = [];
-                for (const kid of dom.childNodes) {
-                    kids.push($mol_tree2_xml_from_dom(kid));
-                }
-                return $mol_tree2.list(kids);
-            }
-            case dom.PROCESSING_INSTRUCTION_NODE: {
-                return $mol_tree2.struct('?', [
-                    $mol_tree2.struct(dom.nodeName, dom.nodeValue.split(' ').map(chunk => {
-                        const [, name, value] = /^(.*?)(?:="(.*?)")?$/.exec(chunk);
-                        const kids = value ? [$mol_tree2.data(value)] : [];
-                        return $mol_tree2.struct(name, kids);
-                    }))
-                ]);
-            }
-            case dom.DOCUMENT_TYPE_NODE: {
-                const dom2 = dom;
-                return $mol_tree2.struct('!', [
-                    $mol_tree2.struct('DOCTYPE', [
-                        $mol_tree2.struct(dom2.name)
-                    ])
-                ]);
-            }
-            case dom.ELEMENT_NODE: {
-                let kids = [];
-                for (const attr of dom.attributes) {
-                    kids.push($mol_tree2.struct('@', [
-                        $mol_tree2.struct(attr.nodeName, [
-                            $mol_tree2.data(attr.nodeValue)
-                        ])
-                    ]));
-                }
-                for (const kid of dom.childNodes) {
-                    const k = $mol_tree2_xml_from_dom(kid);
-                    if (k.type || k.value)
-                        kids.push(k);
-                }
-                return $mol_tree2.struct(dom.nodeName, kids);
-            }
-            case dom.COMMENT_NODE: {
-                return $mol_tree2.struct('--', [
-                    $mol_tree2.data(dom.nodeValue)
-                ]);
-            }
-            case dom.TEXT_NODE: {
-                if (!dom.nodeValue.trim())
-                    return $mol_tree2.list([]);
-                return $mol_tree2.data(dom.nodeValue.replace(/\s+/g, ' '));
-            }
-        }
-        return $mol_fail(new Error(`Unsupported node ${dom.nodeName}`));
-    }
-    $.$mol_tree2_xml_from_dom = $mol_tree2_xml_from_dom;
-})($ || ($ = {}));
-
-;
-"use strict";
-/** @jsx $mol_jsx */
-var $;
-(function ($) {
-    function $giper_baza_vary_cast_blob(vary) {
-        return ArrayBuffer.isView(vary) ? vary : null;
-    }
-    $.$giper_baza_vary_cast_blob = $giper_baza_vary_cast_blob;
-    function $giper_baza_vary_cast_bool(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => Boolean(vary.byteLength),
-            bool: vary => vary,
-            bint: vary => Boolean(vary),
-            real: vary => Boolean(vary),
-            link: vary => vary.str !== '',
-            text: vary => Boolean(vary),
-            time: vary => Boolean(vary.valueOf()),
-            dura: vary => Boolean(vary.valueOf()),
-            span: vary => Boolean(vary.duration.valueOf()),
-            dict: vary => Boolean(Reflect.ownKeys(vary).length),
-            list: vary => Boolean(vary.length),
-            elem: vary => Boolean(vary.attributes.length + vary.childNodes.length),
-            tree: vary => Boolean(vary.value || vary.kids.length),
-        });
-    }
-    $.$giper_baza_vary_cast_bool = $giper_baza_vary_cast_bool;
-    function $giper_baza_vary_cast_bint(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => BigInt(vary.length),
-            bool: vary => BigInt(vary),
-            bint: vary => vary,
-            real: vary => Number.isFinite(vary) ? BigInt(Math.trunc(vary)) : null,
-            link: vary => null,
-            text: vary => {
-                try {
-                    return vary ? BigInt(vary) : null;
-                }
-                catch {
-                    return null;
-                }
-            },
-            time: vary => BigInt(vary.valueOf()),
-            dura: vary => BigInt(vary.valueOf()),
-            span: vary => BigInt(vary.duration.valueOf()),
-            dict: vary => BigInt(Reflect.ownKeys(vary).length),
-            list: vary => BigInt(vary.length),
-            elem: vary => BigInt(vary.attributes.length + vary.childNodes.length),
-            tree: vary => {
-                try {
-                    return BigInt(vary.value);
-                }
-                catch {
-                    return BigInt(vary.kids.length);
-                }
-            },
-        });
-    }
-    $.$giper_baza_vary_cast_bint = $giper_baza_vary_cast_bint;
-    function $giper_baza_vary_cast_real(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => vary.length,
-            bool: vary => Number(vary),
-            bint: vary => Number(vary),
-            real: vary => vary,
-            link: vary => null,
-            text: vary => vary ? Number(vary) : null,
-            time: vary => vary.valueOf(),
-            dura: vary => vary.valueOf(),
-            span: vary => vary.duration.valueOf(),
-            dict: vary => Reflect.ownKeys(vary).length,
-            list: vary => vary.length,
-            elem: vary => Number(vary.attributes.length + vary.childNodes.length),
-            tree: vary => Number(vary.value || vary.kids.length),
-        });
-    }
-    $.$giper_baza_vary_cast_real = $giper_baza_vary_cast_real;
-    function $giper_baza_vary_cast_link(vary) {
-        return vary instanceof $giper_baza_link ? vary : null;
-    }
-    $.$giper_baza_vary_cast_link = $giper_baza_vary_cast_link;
-    function $giper_baza_vary_cast_text(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => $mol_base64_ae_encode(new Uint8Array(vary.buffer, vary.byteOffset, vary.byteLength)),
-            bool: vary => String(vary),
-            bint: vary => String(vary),
-            real: vary => String(vary),
-            link: vary => vary.str,
-            text: vary => vary,
-            time: vary => String(vary),
-            dura: vary => String(vary),
-            span: vary => String(vary),
-            dict: vary => JSON.stringify(vary),
-            list: vary => JSON.stringify(vary),
-            elem: vary => $mol_dom_serialize(vary),
-            tree: vary => String(vary),
-        });
-    }
-    $.$giper_baza_vary_cast_text = $giper_baza_vary_cast_text;
-    function $giper_baza_vary_cast_time(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => null,
-            bool: vary => null,
-            bint: vary => new $mol_time_moment(Number(vary & 0xffffffffffffn)),
-            real: vary => {
-                try {
-                    return new $mol_time_moment(vary);
-                }
-                catch {
-                    return null;
-                }
-            },
-            link: vary => null,
-            text: vary => {
-                try {
-                    return vary ? new $mol_time_moment(vary) : null;
-                }
-                catch {
-                    return null;
-                }
-            },
-            time: vary => vary,
-            dura: vary => null,
-            span: vary => null,
-            dict: vary => {
-                try {
-                    return new $mol_time_moment(vary);
-                }
-                catch {
-                    return null;
-                }
-            },
-            list: vary => null,
-            elem: vary => null,
-            tree: vary => null,
-        });
-    }
-    $.$giper_baza_vary_cast_time = $giper_baza_vary_cast_time;
-    function $giper_baza_vary_cast_dura(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => null,
-            bool: vary => null,
-            bint: vary => new $mol_time_duration(Number(vary & 0xffffffffffffn)),
-            real: vary => {
-                try {
-                    return new $mol_time_duration(vary);
-                }
-                catch {
-                    return null;
-                }
-            },
-            link: vary => null,
-            text: vary => {
-                try {
-                    return new $mol_time_duration(vary);
-                }
-                catch {
-                    return null;
-                }
-            },
-            time: vary => null,
-            dura: vary => vary,
-            span: vary => null,
-            dict: vary => new $mol_time_duration(vary),
-            list: vary => null,
-            elem: vary => null,
-            tree: vary => null,
-        });
-    }
-    $.$giper_baza_vary_cast_dura = $giper_baza_vary_cast_dura;
-    function $giper_baza_vary_cast_span(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => null,
-            bool: vary => null,
-            bint: vary => null,
-            real: vary => null,
-            link: vary => null,
-            text: vary => {
-                try {
-                    return vary ? new $mol_time_interval(vary) : null;
-                }
-                catch {
-                    return null;
-                }
-            },
-            time: vary => new $mol_time_interval({ start: vary, duration: 0 }),
-            dura: vary => null,
-            span: vary => vary,
-            dict: vary => {
-                try {
-                    return new $mol_time_interval(vary);
-                }
-                catch {
-                    return null;
-                }
-            },
-            list: vary => null,
-            elem: vary => null,
-            tree: vary => null,
-        });
-    }
-    $.$giper_baza_vary_cast_span = $giper_baza_vary_cast_span;
-    function $giper_baza_vary_cast_dict(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => null,
-            bool: vary => null,
-            bint: vary => null,
-            real: vary => null,
-            link: vary => null,
-            text: vary => {
-                if (!vary)
-                    return null;
-                try {
-                    const res = JSON.parse(vary);
-                    if (typeof res === 'object')
-                        return res;
-                    return null;
-                }
-                catch {
-                    return null;
-                }
-            },
-            time: vary => ({ ...vary }),
-            dura: vary => ({ ...vary }),
-            span: vary => ({ ...vary }),
-            dict: vary => vary,
-            list: vary => Object(vary[0]),
-            elem: vary => null,
-            tree: vary => null,
-        });
-    }
-    $.$giper_baza_vary_cast_dict = $giper_baza_vary_cast_dict;
-    function $giper_baza_vary_cast_list(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => [...vary],
-            bool: vary => [vary],
-            bint: vary => [vary.toString()],
-            real: vary => Number.isFinite(vary) ? [vary] : null,
-            link: vary => [vary.str],
-            text: vary => {
-                if (!vary)
-                    return null;
-                try {
-                    return [].concat(JSON.parse(vary));
-                }
-                catch {
-                    return [vary];
-                }
-            },
-            time: vary => [vary.toJSON()],
-            dura: vary => [vary.toJSON()],
-            span: vary => [vary.toJSON()],
-            dict: vary => [vary],
-            list: vary => vary,
-            elem: vary => [$mol_dom_serialize(vary)],
-            tree: vary => [vary.toString()],
-        });
-    }
-    $.$giper_baza_vary_cast_list = $giper_baza_vary_cast_list;
-    function $giper_baza_vary_cast_elem(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => $mol_jsx("body", null, $giper_baza_vary_cast_text(vary)),
-            bool: vary => $mol_jsx("body", null, vary),
-            bint: vary => $mol_jsx("body", null, vary),
-            real: vary => $mol_jsx("body", null, vary),
-            link: vary => $mol_jsx("body", null, vary.str),
-            text: vary => {
-                if (!vary)
-                    return null;
-                try {
-                    return vary ? $mol_dom_parse(vary, 'application/xhtml+xml').documentElement : null;
-                }
-                catch {
-                    return $mol_jsx("body", null, vary);
-                }
-            },
-            time: vary => $mol_jsx("body", null, vary),
-            dura: vary => $mol_jsx("body", null, vary),
-            span: vary => $mol_jsx("body", null, vary),
-            dict: vary => $mol_jsx("body", null, JSON.stringify(vary)),
-            list: vary => $mol_jsx("body", null, JSON.stringify(vary)),
-            elem: vary => vary,
-            tree: vary => $mol_jsx("body", null, vary),
-        });
-    }
-    $.$giper_baza_vary_cast_elem = $giper_baza_vary_cast_elem;
-    function $giper_baza_vary_cast_tree(vary) {
-        return $giper_baza_vary_switch(vary, {
-            none: vary => null,
-            blob: vary => vary instanceof Uint8Array ? $mol_tree2_bin_from_bytes(vary) : null,
-            bool: vary => $mol_tree2.struct(vary.toString()),
-            bint: vary => $mol_tree2.struct(vary.toString()),
-            real: vary => $mol_tree2.struct(vary.toString()),
-            link: vary => $mol_tree2.struct(vary.str),
-            text: vary => {
-                if (!vary)
-                    return null;
-                try {
-                    return $$.$mol_tree2_from_string(vary);
-                }
-                catch {
-                    return $$.$mol_tree2.data(vary);
-                }
-            },
-            time: vary => $mol_tree2.struct(vary.toString()),
-            dura: vary => $mol_tree2.struct(vary.toString()),
-            span: vary => $mol_tree2.struct(vary.toString()),
-            dict: vary => $$.$mol_tree2_from_json(vary),
-            list: vary => $$.$mol_tree2_from_json(vary),
-            elem: vary => $$.$mol_tree2_xml_from_dom(vary),
-            tree: vary => vary,
-        });
-    }
-    $.$giper_baza_vary_cast_tree = $giper_baza_vary_cast_tree;
-    $.$giper_baza_vary_cast_funcs = {
-        none: () => null,
-        blob: $giper_baza_vary_cast_blob,
-        bool: $giper_baza_vary_cast_bool,
-        bint: $giper_baza_vary_cast_bint,
-        real: $giper_baza_vary_cast_real,
-        link: $giper_baza_vary_cast_link,
-        text: $giper_baza_vary_cast_text,
-        time: $giper_baza_vary_cast_time,
-        dura: $giper_baza_vary_cast_dura,
-        span: $giper_baza_vary_cast_span,
-        dict: $giper_baza_vary_cast_dict,
-        list: $giper_baza_vary_cast_list,
-        elem: $giper_baza_vary_cast_elem,
-        tree: $giper_baza_vary_cast_tree,
-    };
 })($ || ($ = {}));
 
 ;
@@ -20226,6 +20031,9 @@ var $;
             return this.$.$giper_baza_auth.current();
         }
         faces = new $giper_baza_face_map;
+        tick() {
+            return this.faces.tick(this.auth().pass().peer());
+        }
         _pass = new $mol_wire_dict();
         _seal_item = new $mol_wire_dict();
         _seal_shot = new $mol_wire_dict();
@@ -20733,7 +20541,7 @@ var $;
                 slices.set(sand, 0);
             merge: if (head.str !== $.$giper_baza_land_root.tine.str) {
                 const tines = (this.Tine()?.items_vary().slice().reverse() ?? [])
-                    .map($giper_baza_vary_cast_link)
+                    .map(val => $giper_baza_link_schema.cast(val))
                     .filter($mol_guard_defined);
                 if (!tines.length)
                     break merge;
@@ -20829,7 +20637,7 @@ var $;
             gift._land = this;
             gift.lord(lord_pass.lord());
             gift.rank(rank);
-            gift.time_tick(this.faces.tick().time_tick);
+            gift.time_tick(this.tick().time_tick);
             if (mate_pass)
                 gift.mate(mate_pass.lord());
             if (rank >= $giper_baza_rank_read) {
@@ -20864,12 +20672,12 @@ var $;
             sand._open = open;
             sand._land = this;
             $giper_baza_unit_trusted_grant(sand);
-            sand.time_tick(this.faces.tick().time_tick);
+            sand.time_tick(this.tick().time_tick);
             sand.lord(lord_pass.lord());
             sand.lead(lead);
             sand.head(head);
             sand._vary = vary;
-            sand.self(self ?? this.self_make($mol_hash_numbers(open, sand.idea_seed())));
+            sand.self(self ?? this.self_make(encrypted ? undefined : $mol_hash_numbers(open, sand.idea_seed())));
             this.diff_apply([lord_pass, sand]);
             this.broadcast();
             return sand;
@@ -20956,24 +20764,24 @@ var $;
                 });
             $mol_wire_sync(this).diff_apply(units, 'skip_load');
         }
-        sand_encoding() {
-            this.loading();
+        sands_unencoded() {
             const sands = [];
             for (const kids of this._sand.values()) {
                 for (const units of kids.values()) {
                     for (const sand of units.values()) {
-                        const sync_sand = $mol_wire_sync(sand);
-                        if (sync_sand._vary === undefined)
+                        if (sand._vary === undefined)
                             continue;
-                        if (sync_sand._ball)
+                        if (sand._ball)
                             continue;
                         sands.push(sand);
                     }
                 }
             }
-            if (!sands.length)
-                return;
-            $mol_wire_sync(this).sands_encode(sands);
+            return sands;
+        }
+        sand_encoding() {
+            this.loading();
+            batch(this, this.sands_unencoded, this.sands_encode);
         }
         units_unsigned() {
             const signing = [];
@@ -21083,14 +20891,14 @@ var $;
             const threads = [...lands.entries()].flatMap(([land, hashes]) => {
                 const auth = land.auth();
                 const rate = $giper_baza_rank_rate_of(land.pass_rank(auth.pass()));
-                const wide = Boolean(land.link().area().str);
+                const wide = !land.link().area().str;
                 return $mol_array_chunks(hashes, $giper_baza_unit_seal_limit).map(async (hashes) => {
                     const seal = $giper_baza_unit_seal.make(hashes.length, wide);
                     seal.lord(auth.pass().lord());
                     seal.hash_list(hashes);
                     seal._land = this;
                     do {
-                        seal.time_tick(this.faces.tick().time_tick);
+                        seal.time_tick(this.tick().time_tick);
                         const sens = seal.shot().mix(this.link());
                         const sign = await auth.signer().sign(sens);
                         seal.sign(sign);
@@ -21164,7 +20972,19 @@ var $;
         // 	return sand._open!
         // }
         sands_open(sands) {
-            const closed = sands.filter(sand => !sand._open);
+            const encrypted = this.encrypted();
+            const closed = sands.filter(sand => {
+                if (sand._open)
+                    return false;
+                if (!sand._ball) {
+                    if (sand.big())
+                        return true;
+                    sand._ball = sand.data();
+                }
+                if (encrypted && !sand.dead())
+                    return true;
+                sand._open = sand._ball;
+            });
             if (!closed.length)
                 return;
             return Promise.all(closed.map(sand => this.sand_open(sand)));
@@ -21172,7 +20992,7 @@ var $;
         async sand_open(sand) {
             if (this.sand_get(sand.head(), sand.lord(), sand.self()) !== sand) {
                 for (const id of this.Tine().items_vary() ?? []) {
-                    const open = await this.$.$giper_baza_glob.Land($giper_baza_vary_cast_link(id)).sand_open(sand);
+                    const open = await this.$.$giper_baza_glob.Land($giper_baza_link_schema.cast(id)).sand_open(sand);
                     if (open)
                         return open;
                 }
@@ -21219,7 +21039,7 @@ var $;
             const unit = $mol_wire_sync($giper_baza_unit_gift).make();
             $giper_baza_unit_trusted_grant(unit);
             unit.rank($giper_baza_rank_rule);
-            unit.time_tick(this.faces.tick().time_tick);
+            unit.time_tick(this.tick().time_tick);
             unit.lord(auth.pass().lord());
             unit.mate(auth.pass().lord());
             unit._land = this;
@@ -21357,6 +21177,9 @@ var $;
     ], $giper_baza_land.prototype, "loading", null);
     __decorate([
         $mol_mem
+    ], $giper_baza_land.prototype, "sands_unencoded", null);
+    __decorate([
+        $mol_mem
     ], $giper_baza_land.prototype, "sand_encoding", null);
     __decorate([
         $mol_mem
@@ -21466,6 +21289,8 @@ var $;
     class $mol_rest_port extends $mol_object {
         send_code(code) { }
         send_type(mime) { }
+        origin() { return 'unknown'; }
+        address() { return 'unknown'; }
         send_data(data) {
             if (data === null)
                 return this.send_nil();
@@ -21610,6 +21435,187 @@ var $;
 "use strict";
 var $;
 (function ($) {
+    class $mol_rest_message extends $mol_object {
+        port;
+        method() {
+            return 'POST';
+        }
+        uri() {
+            return new URL(`rest://localhost/`);
+        }
+        type() {
+            return 'application/octet-stream';
+        }
+        origin() {
+            return 'unknown';
+        }
+        address() {
+            return 'unknown';
+        }
+        protocols() {
+            return [];
+        }
+        data() {
+            return null;
+        }
+        bin() {
+            let data = this.data();
+            if (data instanceof Uint8Array)
+                return data;
+            if (data instanceof $mol_dom_context.Element)
+                data = $mol_dom_serialize(data);
+            if (typeof data !== 'string')
+                data = JSON.stringify(data);
+            return $mol_charset_encode(data);
+        }
+        text() {
+            const data = this.data();
+            if (typeof data === 'string')
+                return data;
+            if (data instanceof Uint8Array)
+                return $mol_charset_decode(data);
+            if (data instanceof $mol_dom_context.Element)
+                return $mol_dom_serialize(data);
+            return JSON.stringify(data);
+        }
+        reply(data, meta) {
+            if (meta?.code)
+                this.port.send_code(meta.code);
+            if (meta?.type)
+                this.port.send_type(meta.type);
+            this.port.send_data(data);
+        }
+        route(uri) {
+            return $mol_rest_message.make({
+                port: this.port,
+                method: () => this.method(),
+                uri: $mol_const(uri),
+                protocols: () => this.protocols(),
+                type: () => this.type(),
+                origin: () => this.origin(),
+                data: () => this.data(),
+            });
+        }
+        derive(method, data) {
+            return $mol_rest_message.make({
+                port: this.port,
+                method: $mol_const(method),
+                uri: () => this.uri(),
+                protocols: () => this.protocols(),
+                type: () => this.type(),
+                origin: () => this.origin(),
+                data: $mol_const(data),
+            });
+        }
+        static make(config) {
+            return super.make(config);
+        }
+    }
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message.prototype, "uri", null);
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message.prototype, "bin", null);
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message.prototype, "text", null);
+    __decorate([
+        $mol_action
+    ], $mol_rest_message.prototype, "route", null);
+    __decorate([
+        $mol_action
+    ], $mol_rest_message.prototype, "derive", null);
+    __decorate([
+        ($mol_action)
+    ], $mol_rest_message, "make", null);
+    $.$mol_rest_message = $mol_rest_message;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    class $mol_rest_message_http extends $mol_rest_message {
+        input;
+        method() {
+            return this.input.method ?? super.method();
+        }
+        uri() {
+            const addr = this.input.socket?.localAddress ?? '::1';
+            const port = this.input.socket?.localPort ?? '80';
+            return new URL(this.input.url, `http://[${addr}]:${port}/`);
+        }
+        type() {
+            return (this.input.headers['content-type'] ?? 'application/octet-stream');
+        }
+        origin() {
+            return this.input.headers['origin'] ?? super.origin();
+        }
+        address() {
+            return String(this.input.headers['x-forwarded-for'] ?? '') || this.input.socket?.remoteAddress || super.address();
+        }
+        protocols() {
+            return String(this.input.headers['sec-websocket-protocol'] ?? '').split(',').map(p => p.trim()).filter(Boolean);
+        }
+        data() {
+            const consume = $mol_wire_sync($node['stream/consumers']);
+            if (this.type().startsWith('text/')) {
+                const text = consume.text(this.input);
+                if (this.type() === 'text/html') {
+                    return $mol_dom_parse(text, 'application/xhtml+xml').documentElement;
+                }
+                return text;
+            }
+            else {
+                if (this.type() === 'application/json') {
+                    return consume.json(this.input);
+                }
+                else {
+                    return new Uint8Array(consume.arrayBuffer(this.input));
+                }
+            }
+        }
+        route(uri) {
+            return $mol_rest_message_http.make({
+                port: this.port,
+                input: this.input,
+                uri: $mol_const(uri),
+                data: () => this.data(),
+            });
+        }
+    }
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message_http.prototype, "method", null);
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message_http.prototype, "uri", null);
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message_http.prototype, "type", null);
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message_http.prototype, "origin", null);
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message_http.prototype, "address", null);
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message_http.prototype, "protocols", null);
+    __decorate([
+        $mol_mem
+    ], $mol_rest_message_http.prototype, "data", null);
+    __decorate([
+        $mol_action
+    ], $mol_rest_message_http.prototype, "route", null);
+    $.$mol_rest_message_http = $mol_rest_message_http;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
     let $mol_websocket_frame_op;
     (function ($mol_websocket_frame_op) {
         $mol_websocket_frame_op[$mol_websocket_frame_op["con"] = 0] = "con";
@@ -21625,6 +21631,7 @@ var $;
      * Payload >= 2^32 isn't supported
      */
     class $mol_websocket_frame extends $mol_buffer {
+        /** Kind of socket frame. */
         kind(next) {
             if (next) {
                 this.setUint8(0, Number(next.fin) << 7 | $mol_websocket_frame_op[next.op]);
@@ -21639,6 +21646,7 @@ var $;
                 return { op, fin };
             }
         }
+        /** Payload info. */
         data(next) {
             if (next === undefined) {
                 const state = this.getUint8(1);
@@ -21665,11 +21673,15 @@ var $;
                 return next;
             }
         }
+        /** Header size (2..14). */
         size() {
+            if (this.byteLength < 2)
+                return 2;
             const short = this.getUint8(1) & 0b0111_1111;
             const mask = this.getUint8(1) >> 7;
             return (short === 127 ? 10 : short === 126 ? 4 : 2) + (mask ? 4 : 0);
         }
+        /** 4 byte mask. */
         mask() {
             return new Uint8Array(this.buffer, this.byteOffset + this.size() - 4, 4);
         }
@@ -21729,7 +21741,17 @@ var $;
 var $;
 (function ($) {
     class $mol_rest_port_ws_node extends $mol_rest_port_ws {
+        prolog;
         socket;
+        upgrade() {
+            return $mol_rest_message_http.make({ port: this, input: this.prolog });
+        }
+        origin() {
+            return this.upgrade().origin();
+        }
+        address() {
+            return this.upgrade().address();
+        }
         send_nil() {
             if (this.socket.writableEnded)
                 return;
@@ -21749,6 +21771,9 @@ var $;
             this.socket.write(bin);
         }
     }
+    __decorate([
+        $mol_mem
+    ], $mol_rest_port_ws_node.prototype, "upgrade", null);
     __decorate([
         $mol_action
     ], $mol_rest_port_ws_node.prototype, "send_nil", null);
@@ -21799,7 +21824,7 @@ var $;
             const link = this.master_current();
             if (!link)
                 return null;
-            const socket = new $mol_dom_context.WebSocket(link.replace(/^http/, 'ws'), ['$giper_baza_yard']);
+            const socket = new $mol_dom_context.WebSocket(link.replace(/^http/, 'ws'), ['$giper_baza_yard_2']);
             socket.binaryType = 'arraybuffer';
             const port = $mol_rest_port_ws_std.make({ socket });
             socket.onmessage = async (event) => {
@@ -22700,7 +22725,7 @@ var $;
             return `${super.toString()} ${tag} ${lead}\\${head}/${self} ${vary}`;
         }
         [$mol_dev_format_head]() {
-            return $mol_dev_format_span({}, $mol_dev_format_native(this), ' 👾', $mol_dev_format_auto(this.lord()), ' 📦 ', $mol_dev_format_shade($giper_baza_time_dump(this.time(), this.tick())), ' #', this.encoded() ? $mol_dev_format_auto(this.hash()) : undefined, ' ', this.lead().str || '__knot__', $mol_dev_format_shade('\\'), $mol_dev_format_accent(this.head().str || '__root__'), $mol_dev_format_shade('/'), this.self().str || '__meta__', ' ', {
+            return $mol_dev_format_span({}, $mol_dev_format_native(this), ' 👾', $mol_dev_format_auto(this.lord()), ' 📦 ', $mol_dev_format_shade($giper_baza_time_dump(this.time(), this.tick())), ' #', this.encoded() ? $mol_dev_format_auto(this.hash()) : $mol_dev_format_shade('___incompleted___'), ' ', this.lead().str || '__knot__', $mol_dev_format_shade('\\'), $mol_dev_format_accent(this.head().str || '__root__'), $mol_dev_format_shade('/'), this.self().str || '__meta__', ' ', {
                 term: '💼',
                 solo: '1️⃣',
                 vals: '🎹',
@@ -23057,7 +23082,9 @@ var $;
         meta_of(peer) {
             const head = this.head();
             const unit = this.land().sand_ordered({ head, peer }).find(unit => !unit.dead() && unit.self().str === '') ?? null;
-            return unit ? $giper_baza_vary_cast_link(this.land().sand_decode(unit)) : null;
+            if (unit)
+                this.land().sands_open([unit]);
+            return unit ? $giper_baza_link_schema.cast(this.land().sand_decode(unit)) : null;
         }
         filled() {
             return this.units().length > 0;
@@ -23123,104 +23150,6 @@ var $;
         $mol_mem
     ], $giper_baza_pawn.prototype, "authors", null);
     $.$giper_baza_pawn = $giper_baza_pawn;
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($) {
-    class $mol_memo_key extends $mol_wrapper {
-        static wrap(task) {
-            const store = new WeakMap();
-            const fun = function (key, next) {
-                let store2 = store.get(this ?? fun);
-                if (!store2)
-                    store.set(this ?? fun, store2 = new Map);
-                const key_str = $mol_key(key);
-                if (next === undefined && store2.has(key_str))
-                    return store2.get(key_str);
-                const val = task.call(this, key, next) ?? next;
-                store2.set(key_str, val);
-                return val;
-            };
-            Reflect.defineProperty(fun, 'name', { value: task.name + ' ' });
-            return fun;
-        }
-    }
-    $.$mol_memo_key = $mol_memo_key;
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($) {
-    class $mol_schema_any extends Object {
-        static [Symbol.toStringTag];
-        static [$mol_key_handle]() {
-            return this.toString();
-        }
-        /** Short user-readable identity. */
-        static toString() {
-            return $$.$mol_func_name(this);
-        }
-        /** Type-guard that checks value by schema. */
-        static check(val) {
-            try {
-                this.guard(val);
-                return true;
-            }
-            catch (error) {
-                return false;
-            }
-        }
-        static [Symbol.hasInstance](val) {
-            return this.check(val);
-        }
-        /** Strict parse. Fails of wrong values. */
-        static guard(value) {
-            return value;
-        }
-        /** Relaxed cast. Normalizes wrong values. */
-        static cast(value) {
-            try {
-                return this.guard(value);
-            }
-            catch (error) {
-                return this.default;
-            }
-        }
-        /** Default value which conforms schema. */
-        static default = undefined;
-    }
-    $.$mol_schema_any = $mol_schema_any;
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($) {
-    $.$mol_schema_instance = $mol_memo_key.func(function $mol_schema_instance(Class) {
-        class $mol_schema_instance_ extends $mol_schema_any {
-            static Class = Class;
-            static toString() {
-                if (this !== $mol_schema_instance_)
-                    return super.toString();
-                return '$mol_schema_instance<' + $$.$mol_func_name(Class) + '>';
-            }
-            static guard(value) {
-                if (value != null && Object(value) instanceof Class)
-                    return value;
-                return $mol_fail(new TypeError('Wrong class', { cause: { value, schema: this } }));
-            }
-            static cast(value) {
-                return this.guard(value);
-            }
-            static default;
-        }
-        return ((Class[Symbol.hasInstance] === $mol_schema_any[Symbol.hasInstance])
-            ? Class
-            : $mol_schema_instance_);
-    });
 })($ || ($ = {}));
 
 ;
@@ -23480,10 +23409,12 @@ var $;
             class $giper_baza_list_of extends $giper_baza_list {
                 static Item = Item;
                 items(next) {
-                    if (next)
-                        for (const item of next)
-                            Item.guard(item);
-                    return this.items_vary(next).map(item => Item.cast(item));
+                    if (next === undefined)
+                        return this.items_vary().map(item => Item.cast(item));
+                    for (const item of next)
+                        Item.guard(item);
+                    this.items_vary(next);
+                    return this.items();
                 }
                 static toString() {
                     return this === $giper_baza_list_of ? '$giper_baza_list.of<' + Item + '>' : super.toString();
@@ -23546,7 +23477,7 @@ var $;
     }
     $.$giper_baza_list_list = $giper_baza_list_list;
     /** Mergeable list of atomic DOM elements */
-    class $giper_baza_list_dom extends $giper_baza_list.of($mol_dom.Element) {
+    class $giper_baza_list_dom extends $giper_baza_list.of($mol_dom.Element ?? Object) {
     }
     $.$giper_baza_list_dom = $giper_baza_list_dom;
     /** Mergeable list of atomic Trees */
@@ -23703,28 +23634,6 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $.$mol_schema_maybe = $mol_memo_key.func(function $mol_schema_maybe(Some) {
-        return class $mol_schema_maybe_ extends $mol_schema_any {
-            static Some = Some;
-            static toString() {
-                if (this !== $mol_schema_maybe_)
-                    return super.toString();
-                return '$mol_schema_maybe<' + $mol_key(Some) + '>';
-            }
-            static guard(value) {
-                if (value == null)
-                    return value;
-                return Some.guard(value);
-            }
-            static default = null;
-        };
-    });
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($) {
     /** Atomic dynamic register */
     class $giper_baza_atom extends $giper_baza_pawn {
         static tag = $giper_baza_unit_sand_tag[$giper_baza_unit_sand_tag.solo];
@@ -23780,7 +23689,7 @@ var $;
                     if (next !== undefined)
                         Schema.guard(next);
                     const res = this.vary_of(peer, next);
-                    return Schema.cast(res);
+                    return next === undefined ? Schema.cast(res) : this.val_of(peer);
                 }
                 static toString() {
                     return this === $giper_baza_atom_of ? '$giper_baza_atom.of<' + Schema + '>' : super.toString();
@@ -23845,7 +23754,7 @@ var $;
     }
     $.$giper_baza_atom_list = $giper_baza_atom_list;
     /** Atomic DOM element */
-    class $giper_baza_atom_elem extends $giper_baza_atom.of($mol_dom.Element) {
+    class $giper_baza_atom_elem extends $giper_baza_atom.of($mol_dom.Element ?? Object) {
     }
     $.$giper_baza_atom_elem = $giper_baza_atom_elem;
     /** Atomic Tree */
@@ -24082,13 +23991,14 @@ var $;
         }
     }
     const handler_promise = (event) => handler('Unhandled Rejection', '', 0, 0, event.reason);
+    const handler_promise_node = (reason) => handler('Unhandled Rejection', '', 0, 0, reason);
     if ('addEventListener' in globalThis) {
         globalThis.addEventListener('error', handler);
         globalThis.addEventListener('unhandledrejection', handler_promise);
     }
     if ('process' in globalThis) {
         process.on('uncaughtExceptionMonitor', handler);
-        process.on('unhandledrejection', handler_promise);
+        // process.on('unhandledRejection', handler_promise_node) // revents process halt
     }
     const console_error = console.error;
     console.error = function console_error_custom(...args) {
@@ -24112,6 +24022,7 @@ var $;
 (function ($) {
     class $giper_baza_app_stat extends $giper_baza_dict.with({
         Uptime: $giper_baza_atom_dura,
+        Slaves: $giper_baza_atom.of($mol_schema_list($mol_schema_string)),
         /** User time in secs */
         Cpu_user: $giper_baza_stat_ranges,
         /** System time in secs */
@@ -24148,6 +24059,9 @@ var $;
         uptime(next) {
             return this.Uptime(next)?.val(next) ?? new $mol_time_duration(0);
         }
+        slaves(next) {
+            return this.Slaves(next)?.val(next) ?? [];
+        }
         init() {
             this.Errors(null).tick_instant(1); // restarts as errors
             let handler = () => this.Errors(null).tick_instant(1);
@@ -24165,7 +24079,9 @@ var $;
                 return;
             }
             this.$.$mol_state_time.now(1000);
+            const yard = this.$.$giper_baza_glob.yard();
             this.uptime(new $mol_time_duration({ second: Math.floor(process.uptime()) }).normal);
+            this.slaves([...yard.slaves].map(port => port.address() + ' ' + port.origin()));
             const res = process.resourceUsage();
             this.Cpu_user(null).tick_integral(Math.ceil(res.userCPUTime / 1e4)); // %
             this.Cpu_system(null).tick_integral(Math.ceil(res.systemCPUTime / 1e4)); // %
@@ -24176,10 +24092,9 @@ var $;
             this.Mem_free(null).tick_instant(Math.floor($node.os.freemem() / mem_total * 100)); // %
             const fs = $node.fs.statfsSync('.');
             this.Fs_free(null).tick_instant(Math.floor(Number(fs.bfree) / Number(fs.blocks) * 100)); // %
-            const yard = $mol_wire_sync(this.$.$giper_baza_glob.yard());
-            const masters = yard.masters().length;
+            const masters = yard.masters()?.length ?? 0;
             this.Port_masters(null).tick_instant(masters); // pct
-            const ports = yard.ports();
+            const ports = yard.ports() ?? [];
             this.Port_slaves(null).tick_instant(ports.length - masters); // pct
             const lands = ports.reduce((sum, port) => sum + yard.port_lands_active(port).size, 0);
             this.Land_active(null).tick_instant(lands); // pct
@@ -24194,6 +24109,9 @@ var $;
     ], $giper_baza_app_stat.prototype, "uptime", null);
     __decorate([
         $mol_mem
+    ], $giper_baza_app_stat.prototype, "slaves", null);
+    __decorate([
+        $mol_mem
     ], $giper_baza_app_stat.prototype, "init", null);
     __decorate([
         $mol_mem
@@ -24205,7 +24123,7 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    $.$giper_baza_flex_deck_link = new $giper_baza_link('AyiXyvOr_k8TaNSel_TkJWFugO');
+    $.$giper_baza_flex_deck_link = new $giper_baza_link('6NUPZgrR_Itnhu9N1_WPsQDQWa');
     /** Subj - named entity */
     class $giper_baza_flex_subj extends $giper_baza_dict.with({
         Name: $giper_baza_atom_text,
@@ -24536,107 +24454,6 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    class $mol_rest_message extends $mol_object {
-        port;
-        method() {
-            return 'POST';
-        }
-        uri() {
-            return new URL(`rest://localhost/`);
-        }
-        type() {
-            return 'application/octet-stream';
-        }
-        origin() {
-            return 'unknown';
-        }
-        address() {
-            return 'unknown';
-        }
-        protocols() {
-            return [];
-        }
-        data() {
-            return null;
-        }
-        bin() {
-            let data = this.data();
-            if (data instanceof Uint8Array)
-                return data;
-            if (data instanceof $mol_dom_context.Element)
-                data = $mol_dom_serialize(data);
-            if (typeof data !== 'string')
-                data = JSON.stringify(data);
-            return $mol_charset_encode(data);
-        }
-        text() {
-            const data = this.data();
-            if (typeof data === 'string')
-                return data;
-            if (data instanceof Uint8Array)
-                return $mol_charset_decode(data);
-            if (data instanceof $mol_dom_context.Element)
-                return $mol_dom_serialize(data);
-            return JSON.stringify(data);
-        }
-        reply(data, meta) {
-            if (meta?.code)
-                this.port.send_code(meta.code);
-            if (meta?.type)
-                this.port.send_type(meta.type);
-            this.port.send_data(data);
-        }
-        route(uri) {
-            return $mol_rest_message.make({
-                port: this.port,
-                method: () => this.method(),
-                uri: $mol_const(uri),
-                protocols: () => this.protocols(),
-                type: () => this.type(),
-                origin: () => this.origin(),
-                data: () => this.data(),
-            });
-        }
-        derive(method, data) {
-            return $mol_rest_message.make({
-                port: this.port,
-                method: $mol_const(method),
-                uri: () => this.uri(),
-                protocols: () => this.protocols(),
-                type: () => this.type(),
-                origin: () => this.origin(),
-                data: $mol_const(data),
-            });
-        }
-        static make(config) {
-            return super.make(config);
-        }
-    }
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message.prototype, "uri", null);
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message.prototype, "bin", null);
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message.prototype, "text", null);
-    __decorate([
-        $mol_action
-    ], $mol_rest_message.prototype, "route", null);
-    __decorate([
-        $mol_action
-    ], $mol_rest_message.prototype, "derive", null);
-    __decorate([
-        ($mol_action)
-    ], $mol_rest_message, "make", null);
-    $.$mol_rest_message = $mol_rest_message;
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($) {
     const makeURL = $mol_wire_sync((url, base) => new URL(url, base));
     class $mol_rest_resource extends $mol_object {
         REQUEST(msg) {
@@ -24722,6 +24539,8 @@ var $;
                     server.root()._auto();
                 }
                 catch (error) {
+                    if ($mol_promise_like(error))
+                        $mol_fail_hidden(error);
                     $mol_fail_log(error);
                 }
             }).fresh();
@@ -24844,6 +24663,7 @@ var $;
             if (this.output.statusCode !== 400)
                 return;
             this.output.statusCode = code;
+            this.output.setHeader('x-content-type-options', 'nosniff');
         }
         send_type(mime) {
             if (this.output.writableEnded)
@@ -24875,80 +24695,8 @@ var $;
 "use strict";
 var $;
 (function ($) {
-    class $mol_rest_message_http extends $mol_rest_message {
-        input;
-        method() {
-            return this.input.method ?? super.method();
-        }
-        uri() {
-            const addr = this.input.socket?.localAddress ?? '::1';
-            const port = this.input.socket?.localPort ?? '80';
-            return new URL(this.input.url, `http://[${addr}]:${port}/`);
-        }
-        type() {
-            return (this.input.headers['content-type'] ?? 'application/octet-stream');
-        }
-        origin() {
-            return this.input.headers['origin'] ?? super.origin();
-        }
-        address() {
-            return String(this.input.headers['x-forwarded-for'] ?? '') || this.input.socket?.remoteAddress || super.address();
-        }
-        protocols() {
-            return String(this.input.headers['sec-websocket-protocol'] ?? '').split(',').map(p => p.trim()).filter(Boolean);
-        }
-        data() {
-            const consume = $mol_wire_sync($node['stream/consumers']);
-            if (this.type().startsWith('text/')) {
-                const text = consume.text(this.input);
-                if (this.type() === 'text/html') {
-                    return $mol_dom_parse(text, 'application/xhtml+xml').documentElement;
-                }
-                return text;
-            }
-            else {
-                if (this.type() === 'application/json') {
-                    return consume.json(this.input);
-                }
-                else {
-                    return new Uint8Array(consume.arrayBuffer(this.input));
-                }
-            }
-        }
-        route(uri) {
-            return $mol_rest_message_http.make({
-                port: this.port,
-                input: this.input,
-                uri: $mol_const(uri),
-                data: () => this.data(),
-            });
-        }
-    }
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message_http.prototype, "method", null);
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message_http.prototype, "uri", null);
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message_http.prototype, "type", null);
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message_http.prototype, "origin", null);
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message_http.prototype, "address", null);
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message_http.prototype, "protocols", null);
-    __decorate([
-        $mol_mem
-    ], $mol_rest_message_http.prototype, "data", null);
-    __decorate([
-        $mol_action
-    ], $mol_rest_message_http.prototype, "route", null);
-    $.$mol_rest_message_http = $mol_rest_message_http;
+    /** @deprecated Use $mol_crypto2_hash */
+    $.$mol_crypto_hash = $mol_crypto2_hash;
 })($ || ($ = {}));
 
 ;
@@ -25015,8 +24763,8 @@ var $;
             res.end();
         }
         ws_upgrade(req, socket, head) {
-            const port = $mol_rest_port_ws_node.make({ socket });
-            const upgrade = $mol_rest_message_http.make({ port, input: req });
+            const port = $mol_rest_port_ws_node.make({ socket, prolog: req });
+            const upgrade = port.upgrade();
             let protocol = '';
             try {
                 protocol = $mol_wire_sync(this.root()).REQUEST(upgrade.derive('OPEN', null));
@@ -25098,13 +24846,22 @@ var $;
                 if (!chunks)
                     this._ws_income_chunks.set(sock, chunks = []);
                 chunks.push(chunk);
-                const patial_size = chunks.reduce((sum, buf) => sum + buf.byteLength, 0);
                 let frame = $mol_websocket_frame.from(chunks[0]);
-                const msg_size = frame.size() + frame.data().size;
-                if (msg_size > patial_size) {
-                    setTimeout(() => sock.resume());
-                    return;
+                let header_size = frame.size();
+                if (chunks[0].byteLength < header_size) {
+                    if (chunks.length < 2)
+                        return setTimeout(() => sock.resume()), undefined;
+                    chunk = Buffer.from([...chunks[0], ...chunks[1]]);
+                    chunks.splice(0, 2, chunk);
+                    frame = $mol_websocket_frame.from(chunk);
+                    header_size = frame.size();
+                    if (chunk.byteLength < header_size)
+                        return setTimeout(() => sock.resume()), undefined;
                 }
+                const msg_size = header_size + frame.data().size;
+                const patial_size = chunks.reduce((sum, buf) => sum + buf.byteLength, 0);
+                if (msg_size > patial_size)
+                    return setTimeout(() => sock.resume()), undefined;
                 chunk = Buffer.alloc(patial_size);
                 let offset = 0;
                 for (const buf of chunks.splice(0)) {
@@ -25277,6 +25034,410 @@ var $;
 "use strict";
 var $;
 (function ($) {
+    /**
+     * Checks for some of given runtype or throws error.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_variant_demo
+     */
+    function $mol_data_variant(...sub) {
+        return $mol_data_setup((val) => {
+            const errors = [];
+            for (const type of sub) {
+                let hidden = $.$mol_fail_hidden;
+                try {
+                    $.$mol_fail = $.$mol_fail_hidden;
+                    return type(val);
+                }
+                catch (error) {
+                    $.$mol_fail = hidden;
+                    if (error instanceof $mol_data_error) {
+                        errors.push(error);
+                    }
+                    else {
+                        return $mol_fail_hidden(error);
+                    }
+                }
+            }
+            return $mol_fail(new $mol_data_error(`${val} is not any of variants`, {}, ...errors));
+        }, sub);
+    }
+    $.$mol_data_variant = $mol_data_variant;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    /**
+     * Checks for string and returns string type.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_string_demo
+     */
+    $.$mol_data_string = (val) => {
+        if (typeof val === 'string')
+            return val;
+        return $mol_fail(new $mol_data_error(`${val} is not a string`));
+    };
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    /**
+     * Checks for undefined or passing given runtype.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_optional_demo
+     */
+    function $mol_data_optional(sub, fallback) {
+        return $mol_data_setup((val) => {
+            if (val === undefined) {
+                return fallback?.();
+            }
+            return sub(val);
+        }, { sub, fallback });
+    }
+    $.$mol_data_optional = $mol_data_optional;
+})($ || ($ = {}));
+
+;
+"use strict";
+
+;
+"use strict";
+var $;
+(function ($) {
+    /**
+     * Checks for record of given fields with by its runtypes and returns expected type.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_record_demo
+     */
+    function $mol_data_record(sub) {
+        return $mol_data_setup((val) => {
+            let res = {};
+            for (const field in sub) {
+                try {
+                    res[field] =
+                        sub[field](val[field]);
+                }
+                catch (error) {
+                    if (error instanceof Promise)
+                        return $mol_fail_hidden(error);
+                    error.message = `[${JSON.stringify(field)}] ${error.message}`;
+                    return $mol_fail(error);
+                }
+            }
+            return res;
+        }, sub);
+    }
+    $.$mol_data_record = $mol_data_record;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    /**
+     * Checks for array of given runtype and returns expected type.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_array_demo
+     */
+    function $mol_data_array(sub) {
+        return $mol_data_setup((val) => {
+            if (!Array.isArray(val))
+                return $mol_fail(new $mol_data_error(`${val} is not an array`));
+            return val.map((item, index) => {
+                try {
+                    return sub(item);
+                }
+                catch (error) {
+                    if (error instanceof Promise)
+                        return $mol_fail_hidden(error);
+                    error.message = `[${index}] ${error.message}`;
+                    return $mol_fail(error);
+                }
+            });
+        }, sub);
+    }
+    $.$mol_data_array = $mol_data_array;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    /**
+     * Checks for boolean and returns boolean type.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_boolean_demo
+     */
+    $.$mol_data_boolean = (val) => {
+        if (typeof val === 'boolean')
+            return val;
+        return $mol_fail(new $mol_data_error(`${val} is not a boolean`));
+    };
+})($ || ($ = {}));
+
+;
+"use strict";
+
+;
+"use strict";
+var $;
+(function ($) {
+    const syntax = new $mol_syntax2({
+        'filter': /!?=/,
+        'range_separator': /@/,
+        'fetch_open': /\(/,
+        'fetch_separator': /[:;&\/?#]/,
+        'fetch_close': /\)/,
+    });
+    function $hyoo_harp_from_string(uri) {
+        let parent = {};
+        let prev = null;
+        let stack = [parent];
+        let range = null;
+        let values = null;
+        function fail_at(offset) {
+            const uri_marked = uri.substring(0, offset) + '\u035C' + uri.substring(offset);
+            $mol_fail(new Error(`Unexpected token at ${offset} of "${uri_marked}"`));
+        }
+        syntax.parse(uri, {
+            '': (text, chunks, offset) => {
+                if (values) {
+                    text = decodeURIComponent(text);
+                    range = (range && range.length > 1)
+                        ? [range[0], range[1] + text]
+                        : [(range?.[0] ?? '') + text];
+                }
+                else {
+                    let [, order, name] = /^([+-]?)(.*)$/.exec(text);
+                    prev = parent[decodeURIComponent(name)] = {};
+                    if (order)
+                        prev['+'] = order === '+';
+                    stack.push(parent);
+                }
+            },
+            'filter': (filter, chinks, offset) => {
+                if (values) {
+                    if (range) {
+                        if (filter === '!=')
+                            range.push(range.pop() + '!');
+                        values.push(range);
+                        range = null;
+                    }
+                    else {
+                        range = [filter];
+                    }
+                }
+                else if (prev) {
+                    values = prev[filter] = [];
+                }
+                else {
+                    values = [];
+                    parent[''] = values;
+                }
+            },
+            'range_separator': (found, chunks, offset) => {
+                if (!values)
+                    fail_at(offset);
+                range = [range?.[0] ?? '', ''];
+            },
+            'fetch_open': (found, chunks, offset) => {
+                if (range) {
+                    range[range.length - 1] += found;
+                }
+                else {
+                    if (!prev)
+                        fail_at(offset);
+                    parent = prev;
+                    values = null;
+                    prev = null;
+                }
+            },
+            'fetch_separator': (found, chunks, offset) => {
+                if (range) {
+                    values.push(range);
+                    range = null;
+                }
+                parent = stack.pop();
+                values = null;
+                prev = null;
+            },
+            'fetch_close': (found) => {
+                if (range) {
+                    range[range.length - 1] += found;
+                }
+                else {
+                    parent = stack.pop();
+                    values = null;
+                    prev = null;
+                }
+            },
+        });
+        if (range)
+            values.push(range);
+        return stack[0];
+    }
+    $.$hyoo_harp_from_string = $hyoo_harp_from_string;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    function $hyoo_harp_to_string(query) {
+        return Object.entries(query).map(([field, harp]) => {
+            if (field === '+')
+                return '';
+            if (field === '=')
+                return '';
+            if (field === '!=')
+                return '';
+            if (!harp)
+                return '';
+            const harp2 = harp;
+            const order = harp2['+'] === true ? '+' : harp2['+'] === false ? '-' : '';
+            const filter = harp2['='] ? '=' : harp2['!='] ? '!=' : '';
+            const name = encodeURIComponent(field);
+            let values = (harp2['='] || harp2['!='] || []).map(([min, max]) => {
+                if (max === undefined || min === max)
+                    return encodeURIComponent(String(min)) + '=';
+                min = (min === undefined) ? '' : encodeURIComponent(String(min));
+                max = (max === undefined) ? '' : encodeURIComponent(String(max));
+                return `${min}@${max}=`;
+            }).join('');
+            let fetch = $hyoo_harp_to_string(harp);
+            if (fetch)
+                fetch = `(${fetch})`;
+            return `${order}${name}${filter}${values}${fetch}`;
+        }).filter(Boolean).join(';');
+    }
+    $.$hyoo_harp_to_string = $hyoo_harp_to_string;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    const Int = $mol_data_pipe($mol_data_variant($mol_data_string, $mol_data_integer), Number);
+    function $hyoo_harp_scheme(sub, value = $mol_data_integer) {
+        const inner = $mol_data_optional($mol_data_record(sub));
+        const values = $mol_data_optional($mol_data_array($mol_data_array(value)));
+        const val = $mol_data_record({
+            ...sub,
+            '+': $mol_data_optional($mol_data_boolean),
+            '=': values,
+            '!=': values,
+            '_num': $mol_data_optional($mol_data_record({
+                '=': $mol_data_array($mol_data_array(Int))
+            })),
+            '_len': inner,
+            '_max': inner,
+            '_min': inner,
+            '_sum': inner,
+        });
+        return Object.assign(val, {
+            parse(str) {
+                return val($hyoo_harp_from_string(str));
+            },
+            build(query) {
+                return $hyoo_harp_to_string(query);
+            },
+        });
+    }
+    $.$hyoo_harp_scheme = $hyoo_harp_scheme;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    function $giper_baza_file_mime_safe(type) {
+        return ['audio', 'video', 'image', 'font'].includes(type.replace(/\/.*$/, ''))
+            ? type
+            : 'application/octet-stream';
+    }
+    $.$giper_baza_file_mime_safe = $giper_baza_file_mime_safe;
+    $.$giper_baza_file_query = $hyoo_harp_scheme({
+        BAZA: $hyoo_harp_scheme({}),
+        file: $hyoo_harp_scheme({}, $mol_data_string),
+    });
+    class $giper_baza_file extends $giper_baza_dict.with({
+        /** File name */
+        Name: $giper_baza_atom_text,
+        /** File Content-Type */
+        Type: $giper_baza_atom_text,
+        /** File content in chunks - list of binaries */
+        Chunks: $giper_baza_list_bin,
+    }) {
+        /** Persistent URI to file content */
+        uri() {
+            return `?BAZA:file=${this.link()};name=${this.name()}`;
+        }
+        /** File name */
+        name(next) {
+            const ext = {
+                'text/plain': 'txt',
+                'application/json': 'json',
+            }[this.type()] ?? 'bin';
+            return this.Name(next)?.val(next) ?? `${this.link()}.${ext}`;
+        }
+        /** Mime type */
+        type(next) {
+            return this.Type(next)?.val(next) ?? 'application/octet-stream';
+        }
+        /** Blob, File etc. */
+        blob(next) {
+            if (!next)
+                return new $mol_blob(this.chunks(), { type: this.type() });
+            const buffer = new Uint8Array($mol_wire_sync(next).arrayBuffer());
+            this.buffer(buffer);
+            this.type(next.type);
+            if (next instanceof $mol_dom_context.File)
+                this.name(next.name);
+            return next;
+        }
+        /** Solid byte buffer. */
+        buffer(next) {
+            if (next) {
+                const chunks = [];
+                for (let offset = 0; offset < next.byteLength;) {
+                    chunks.push(next.slice(offset, offset += 2 ** 15)); // split by 32 KB
+                }
+                this.chunks(chunks);
+                return next;
+            }
+            else {
+                const chunks = this.chunks();
+                const size = chunks.reduce((sum, chunk) => sum + chunk.byteLength, 0);
+                const res = new Uint8Array(size);
+                let offset = 0;
+                for (const chunk of chunks) {
+                    res.set(chunk, offset);
+                    offset += chunk.byteLength;
+                }
+                return res;
+            }
+        }
+        chunks(next) {
+            return (this.Chunks(next)?.items(next)?.filter($mol_guard_defined) ?? []);
+        }
+        str(next, type = 'text/plain') {
+            if (next === undefined)
+                return $mol_charset_decode(this.buffer());
+            this.buffer($mol_charset_encode(next));
+            this.type(type);
+            return next;
+        }
+        json(next, type = 'application/json') {
+            if (next === undefined)
+                return JSON.parse(this.str());
+            this.str(JSON.stringify(next), type);
+            return next;
+        }
+    }
+    $.$giper_baza_file = $giper_baza_file;
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
     class $giper_baza_app_home extends $giper_baza_flex_peer {
         init() {
             this.meta($giper_baza_flex_peer.meta);
@@ -25323,19 +25484,36 @@ var $;
         link() {
             return new $giper_baza_app_node_link;
         }
-        _protocols = ['$giper_baza_yard'];
+        _protocols = ['$giper_baza_yard_2'];
+        GET(msg) {
+            let id;
+            try {
+                id = $giper_baza_file_query.parse(msg.uri().search).file['=']?.[0][0];
+            }
+            catch { }
+            if (!id)
+                return super.GET(msg);
+            const link = new $giper_baza_link(id);
+            const file = this.$.$giper_baza_glob.Pawn(link, $giper_baza_file);
+            msg.port.send_code(file.filled() ? 200 : 404);
+            msg.port.send_type($giper_baza_file_mime_safe(file.type()));
+            msg.port.send_bin(file.buffer());
+        }
+        _yard() {
+            return this.$.$giper_baza_glob.yard();
+        }
         OPEN(msg) {
             const protocol = super.OPEN(msg);
             if (!protocol)
                 return '';
-            this.$.$giper_baza_glob.yard().slaves.add(msg.port);
+            this._yard().slaves.add(msg.port);
             return protocol;
         }
         POST(msg) {
-            this.$.$giper_baza_glob.yard().port_income(msg.port, msg.bin());
+            this._yard().port_income(msg.port, msg.bin());
         }
         CLOSE(msg) {
-            this.$.$giper_baza_glob.yard().slaves.delete(msg.port);
+            this._yard().slaves.delete(msg.port);
             super.CLOSE(msg);
         }
         _auto() {
@@ -26434,6 +26612,11 @@ var $;
 (function ($) {
     var $$;
     (function ($$) {
+        // Синхронизация через Гипер Базу отключена: список мастеров пустой.
+        // Чистки одного masters_default мало — masters() склеивает его с пирами
+        // из бандленного сида, где зашит публичный мастер. Глушим сам masters().
+        $giper_baza_yard.masters_default.length = 0;
+        $giper_baza_yard.masters = () => [];
         class $bog_talks extends $.$bog_talks {
             domain() {
                 return this.$.$bog_talks_domain;
@@ -31156,6 +31339,34 @@ var $;
 
 ;
 "use strict";
+/** @jsx $mol_jsx */
+/** @jsxFrag $mol_jsx_frag */
+var $;
+(function ($) {
+    $mol_test({
+        'safe tag'() {
+            $mol_assert_equal($mol_dom_serialize($$.$mol_dom_safe([$mol_jsx("div", null, "foo")])[0]), $mol_dom_serialize($mol_jsx("div", null, "foo")));
+        },
+        'bad tag'() {
+            $mol_assert_equal($mol_dom_serialize($$.$mol_dom_safe([$mol_jsx("script", null, "alert('ahtung!')")])[0]), $mol_dom_serialize($mol_jsx($mol_jsx_frag, null, "alert('ahtung!')")));
+        },
+        'common attr'() {
+            $mol_assert_equal($mol_dom_serialize($$.$mol_dom_safe([$mol_jsx("a", { id: "foo" }, "foo")])[0]), $mol_dom_serialize($mol_jsx("a", { id: "foo" }, "foo")));
+        },
+        'safe attr'() {
+            $mol_assert_equal($mol_dom_serialize($$.$mol_dom_safe([$mol_jsx("a", { href: "https://example.org/" }, "foo")])[0]), $mol_dom_serialize($mol_jsx("a", { href: "https://example.org/" }, "foo")));
+        },
+        'bad attr'() {
+            $mol_assert_equal($mol_dom_serialize($$.$mol_dom_safe([$mol_jsx("a", { onclick: "alert('ahtung!')" }, "foo")])[0]), $mol_dom_serialize($mol_jsx("a", null, "foo")));
+        },
+        'danger attr'() {
+            $mol_assert_equal($mol_dom_serialize($$.$mol_dom_safe([$mol_jsx("a", { href: "javascript:alert('ahtung!')" }, "foo")])[0]), $mol_dom_serialize($mol_jsx("a", { href: "about:blank#javascript:alert('ahtung!')" }, "foo")));
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
 var $;
 (function ($) {
     $mol_test({
@@ -31525,6 +31736,117 @@ var $;
             $mol_assert_equal($mol_crypto2_hash(data), new Uint8Array(await $mol_crypto_native.subtle.digest('SHA-1', data)));
         },
     });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($_1) {
+    var $$;
+    (function ($$) {
+        $mol_test({
+            "Float schema"($) {
+                $mol_assert_equal('$mol_schema_float', $mol_schema_float + '', $mol_key($mol_schema_float));
+                $mol_assert_equal(true, $mol_schema_float.check(0));
+                $mol_assert_equal(true, $mol_schema_float.check(Number.NaN));
+                $mol_assert_equal(true, $mol_schema_float.check(Number.POSITIVE_INFINITY));
+                $mol_assert_equal(false, $mol_schema_float.check(null));
+                $mol_assert_equal(1.5, $mol_schema_float.cast(1.5));
+                $mol_assert_equal(Number.NaN, $mol_schema_float.cast('0'));
+                $mol_assert_equal(Number.EPSILON, $mol_schema_float.guard(Number.EPSILON));
+                $mol_assert_fail(() => $mol_schema_float.guard('0'), 'Wrong type');
+            },
+        });
+    })($$ = $_1.$$ || ($_1.$$ = {}));
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($_1) {
+    var $$;
+    (function ($$) {
+        $mol_test({
+            "String schema"($) {
+                $mol_assert_equal('$mol_schema_string', $mol_schema_string + '', $mol_key($mol_schema_string));
+                $mol_assert_equal(true, $mol_schema_string.check('foo'));
+                $mol_assert_equal(false, $mol_schema_string.check(123));
+                $mol_assert_equal('foo', $mol_schema_string.cast('foo'));
+                $mol_assert_equal('', $mol_schema_string.cast(123));
+                $mol_assert_equal('foo', $mol_schema_string.guard('foo'));
+                $mol_assert_fail(() => $mol_schema_string.guard(123), 'Wrong type');
+            },
+        });
+    })($$ = $_1.$$ || ($_1.$$ = {}));
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($_1) {
+    var $$;
+    (function ($$) {
+        $mol_test({
+            "Cache of maybe schema"($) {
+                $mol_assert_equal($mol_schema_maybe($mol_schema_float), $mol_schema_maybe($mol_schema_float));
+                $mol_assert_unique($mol_schema_maybe($mol_schema_float), $mol_schema_maybe($mol_schema_string));
+            },
+            "Optional value"($) {
+                const Config = $mol_schema_maybe($mol_schema_string);
+                $mol_assert_equal('$mol_schema_maybe<$mol_schema_string>', Config + '');
+                $mol_assert_equal(true, Config.check('foo'));
+                $mol_assert_equal(true, Config.check(undefined));
+                $mol_assert_equal(true, Config.check(null));
+                $mol_assert_equal(false, Config.check(0));
+                $mol_assert_equal('foo', Config.cast('foo'));
+                $mol_assert_equal(undefined, Config.cast(undefined));
+                $mol_assert_equal(null, Config.cast(null));
+                $mol_assert_equal(null, Config.cast(0));
+                $mol_assert_equal('foo', Config.guard('foo'));
+                $mol_assert_fail(() => Config.guard(123), 'Wrong type');
+            },
+        });
+    })($$ = $_1.$$ || ($_1.$$ = {}));
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($_1) {
+    var $$;
+    (function ($$) {
+        $mol_test({
+            "Cache of instance schema"($) {
+                $mol_assert_equal($mol_schema_instance(Uint8Array), $mol_schema_instance(Uint8Array));
+                $mol_assert_unique($mol_schema_instance(Uint8Array), $mol_schema_instance(Int8Array));
+            },
+            "Class instance schema"($) {
+                const Blob = $mol_schema_instance(Uint8Array);
+                $mol_assert_equal('$mol_schema_instance<Uint8Array>', Blob + '', $mol_key(Blob));
+                $mol_assert_equal(true, Blob.check(new Uint8Array));
+                $mol_assert_equal(false, Blob.check(new Int8Array));
+                $mol_assert_equal(false, Blob.check(null));
+                $mol_assert_equal(new Uint8Array([0, 1]), Blob.cast(new Uint8Array([0, 1])));
+                $mol_assert_fail(() => Blob.cast(new Int8Array), 'Wrong class');
+                $mol_assert_equal(new Uint8Array, Blob.guard(new Uint8Array));
+                $mol_assert_fail(() => Blob.guard(new Int8Array), 'Wrong class');
+            },
+            "Boxed instance schema"($) {
+                const Str = $mol_schema_instance(String);
+                $mol_assert_equal('$mol_schema_instance<String>', Str + '', $mol_key(Str));
+                $mol_assert_equal(true, Str.check(Object('')));
+                $mol_assert_equal(true, Str.check(''));
+                $mol_assert_equal(true, Object('') instanceof Str);
+            },
+            "Schema instance schema"($) {
+                const Str = $mol_schema_instance($mol_schema_instance(String));
+                $mol_assert_equal('$mol_schema_instance<String>', Str + '', $mol_key(Str));
+                $mol_assert_equal(true, Str.check(Object('')));
+                $mol_assert_equal(true, Str.check(''));
+                $mol_assert_equal(true, Object('') instanceof Str);
+            },
+        });
+    })($$ = $_1.$$ || ($_1.$$ = {}));
 })($ || ($ = {}));
 
 ;
@@ -32266,7 +32588,7 @@ var $;
                 check('hi', [0x68, 0x69]);
             },
             "1B ASCII with diacritic"($) {
-                check('allo\u0302', [0x61, 0x6C, 0x6C, 0x6F, 0xEA]);
+                check('allo\u0300', [0x61, 0x6C, 0x6C, 0x6F, 0xE2]);
             },
             "1B Cyrillic"($) {
                 check('мир', [0x88, 0x3C, 0xE2, 0x40, 0xF8]);
@@ -32312,6 +32634,18 @@ var $;
                 const error = $mol_assert_fail(() => $mol_charset_ucf_decode(bin), 'Wrong byte');
                 $mol_assert_equal(error.cause.pos, 4);
                 $mol_assert_equal(error.cause.text, '🏴');
+            },
+            "Wrong 2B sequence length"($) {
+                const bin = new Uint8Array([0x78, 0xF9, 0x0E]);
+                const error = $mol_assert_fail(() => $mol_charset_ucf_decode(bin), 'Expected 2 bytes');
+                $mol_assert_equal(error.cause.pos, 2);
+                $mol_assert_equal(error.cause.text, 'x');
+            },
+            "Wrong 3B sequence length"($) {
+                const bin = new Uint8Array([0x78, 0xF7, 0x2F, 0x47]);
+                const error = $mol_assert_fail(() => $mol_charset_ucf_decode(bin), 'Expected 3 bytes');
+                $mol_assert_equal(error.cause.pos, 2);
+                $mol_assert_equal(error.cause.text, 'x');
             },
         });
     })($$ = $_1.$$ || ($_1.$$ = {}));
@@ -32526,9 +32860,9 @@ var $;
             },
             "vary pack Date"($) {
                 const date1 = new Date('2025-01-02T03:04:05');
-                check([date1], [tupl | 1, list | 1, text | 9, ...str('unix_time'), uint | L4, ...new Uint8Array(new Uint32Array([date1.valueOf() / 1000]).buffer)]);
+                check([date1], [tupl | 1, list | 1, text | $mol_vary_len.L1, 9, ...str('unix_time'), uint | L4, ...new Uint8Array(new Uint32Array([date1.valueOf() / 1000]).buffer)]);
                 const date2 = new Date('2025-01-02T03:04:05.678');
-                check([date2], [tupl | 1, list | 1, text | 9, ...str('unix_time'), fp64, ...new Uint8Array(new Float64Array([date2.valueOf() / 1000]).buffer)]);
+                check([date2], [tupl | 1, list | 1, text | $mol_vary_len.L1, 9, ...str('unix_time'), fp64, ...new Uint8Array(new Float64Array([date2.valueOf() / 1000]).buffer)]);
             },
             "vary pack DOM Element"($) {
                 $mol_assert_equal($mol_dom_serialize($mol_jsx("div", null,
@@ -32653,225 +32987,6 @@ var $;
 "use strict";
 var $;
 (function ($_1) {
-    var $$;
-    (function ($$) {
-        $mol_test({
-            "Cast from blob"($) {
-                const vary = new Uint8Array([1, 2, 3]);
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), vary);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), true);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), 3n);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), 3);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), 'AQID');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), [1, 2, 3]);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>AQID</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), '\\01\n\\02\n\\03\n');
-            },
-            "Cast from false"($) {
-                const vary = false;
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), false);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), 0n);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), 0);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), 'false');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), [false]);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>false</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), 'false\n');
-            },
-            "Cast from true"($) {
-                const vary = true;
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), true);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), 1n);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), 1);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), 'true');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), [true]);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>true</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), 'true\n');
-            },
-            "Cast from 0n"($) {
-                const vary = 0n;
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), false);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), 0n);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), 0);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), '0');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary)?.toOffset(0).toString(), '1970-01-01T00:00:00+00:00');
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary)?.toString(), 'PT');
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), ['0']);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>0</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), '0\n');
-            },
-            "Cast from big int"($) {
-                const vary = 4611686018427387903n;
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), true);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), 4611686018427387903n);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), 4611686018427388000);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), '4611686018427387903');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary)?.toOffset(0).toString(), '10889-08-02T05:31:50.655+00:00');
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary)?.toString(), 'PT281474976710.655S');
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), ['4611686018427387903']);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>4611686018427387903</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), '4611686018427387903\n');
-            },
-            "Cast from 0"($) {
-                const vary = 0;
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), false);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), 0n);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), 0);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), '0');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary)?.toOffset(0).toString(), '1970-01-01T00:00:00+00:00');
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary)?.toString(), 'PT');
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), [0]);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>0</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), '0\n');
-            },
-            "Cast from PI"($) {
-                const vary = Math.PI;
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), true);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), 3n);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), Math.PI);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), '3.141592653589793');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary)?.toOffset(0).toString(), '1970-01-01T00:00:00.003+00:00');
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary)?.toString(), "PT0.0031415926535897933S");
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), [Math.PI]);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>3.141592653589793</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), '3.141592653589793\n');
-            },
-            "Cast from NaN"($) {
-                const vary = Number.NaN;
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), false);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), Number.NaN);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), 'NaN');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>NaN</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), 'NaN\n');
-            },
-            "Cast from Infinity"($) {
-                const vary = Number.POSITIVE_INFINITY;
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), true);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), Number.POSITIVE_INFINITY);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), 'Infinity');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>Infinity</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), 'Infinity\n');
-            },
-            "Cast from empty string"($) {
-                const vary = '';
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), false);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), '');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary), null);
-            },
-            "Cast from number string"($) {
-                const vary = '123456789012345678901234567890123456789';
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), true);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), 123456789012345678901234567890123456789n);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), 1.2345678901234568e+38);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), '123456789012345678901234567890123456789');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), [1.2345678901234568e+38]);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>123456789012345678901234567890123456789</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), '\\123456789012345678901234567890123456789\n');
-            },
-            "Cast from wild string"($) {
-                const vary = 'foo';
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), true);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), Number.NaN);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), 'foo');
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), ['foo']);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>foo</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), '\\foo\n');
-            },
-            "Cast from Link"($) {
-                const vary = new $giper_baza_link('qwertyui_asdfghjk_zxcvbnm0');
-                $mol_assert_equal($giper_baza_vary_cast_blob(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_bool(vary), true);
-                $mol_assert_equal($giper_baza_vary_cast_bint(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_real(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_link(vary), vary);
-                $mol_assert_equal($giper_baza_vary_cast_text(vary), vary.str);
-                $mol_assert_equal($giper_baza_vary_cast_time(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dura(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_span(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_dict(vary), null);
-                $mol_assert_equal($giper_baza_vary_cast_list(vary), ['qwertyui_asdfghjk_zxcvbnm0']);
-                $mol_assert_equal($giper_baza_vary_cast_elem(vary)?.outerHTML, '<body>qwertyui_asdfghjk_zxcvbnm0</body>');
-                $mol_assert_equal($giper_baza_vary_cast_tree(vary)?.toString(), 'qwertyui_asdfghjk_zxcvbnm0\n');
-            },
-        });
-    })($$ = $_1.$$ || ($_1.$$ = {}));
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($_1) {
     $mol_test_mocks.push($ => {
         class $mol_bus extends $.$mol_bus {
             send() { }
@@ -32894,9 +33009,9 @@ var $;
     });
     $mol_test({
         async 'Give rights'($) {
-            const auth0 = await $.$giper_baza_auth.generate();
-            const auth1 = await $.$giper_baza_auth.generate();
-            const auth2 = await $.$giper_baza_auth.generate();
+            const auth0 = await $.$giper_baza_auth.grab();
+            const auth1 = await $.$giper_baza_auth.grab();
+            const auth2 = await $.$giper_baza_auth.grab();
             const land0 = $giper_baza_land.make({ $, auth: () => auth0 });
             const land1 = $giper_baza_land.make({ $, link: () => land0.link(), auth: () => auth1 });
             $mol_assert_equal(land0.lord_rank(land0.link()), $giper_baza_rank_rule);
@@ -32920,8 +33035,8 @@ var $;
             land1.give(auth2.pass(), $giper_baza_rank_post('just'));
         },
         async 'Post Data and pick Delta'($) {
-            const auth1 = await $.$giper_baza_auth.generate();
-            const auth2 = await $.$giper_baza_auth.generate();
+            const auth1 = $.$giper_baza_auth.grab();
+            const auth2 = $.$giper_baza_auth.grab();
             const land1 = $giper_baza_land.make({ $, auth: () => auth1 });
             const land2 = $giper_baza_land.make({ $, link: () => land1.link(), auth: () => auth2 });
             $mol_assert_equal(await $mol_wire_async(land1).diff_units(), []);
@@ -33138,46 +33253,6 @@ var $;
     var $$;
     (function ($$) {
         $mol_test({
-            "Cache of instance schema"($) {
-                $mol_assert_equal($mol_schema_instance(Uint8Array), $mol_schema_instance(Uint8Array));
-                $mol_assert_unique($mol_schema_instance(Uint8Array), $mol_schema_instance(Int8Array));
-            },
-            "Class instance schema"($) {
-                const Blob = $mol_schema_instance(Uint8Array);
-                $mol_assert_equal('$mol_schema_instance<Uint8Array>', Blob + '', $mol_key(Blob));
-                $mol_assert_equal(true, Blob.check(new Uint8Array));
-                $mol_assert_equal(false, Blob.check(new Int8Array));
-                $mol_assert_equal(false, Blob.check(null));
-                $mol_assert_equal(new Uint8Array([0, 1]), Blob.cast(new Uint8Array([0, 1])));
-                $mol_assert_fail(() => Blob.cast(new Int8Array), 'Wrong class');
-                $mol_assert_equal(new Uint8Array, Blob.guard(new Uint8Array));
-                $mol_assert_fail(() => Blob.guard(new Int8Array), 'Wrong class');
-            },
-            "Boxed instance schema"($) {
-                const Str = $mol_schema_instance(String);
-                $mol_assert_equal('$mol_schema_instance<String>', Str + '', $mol_key(Str));
-                $mol_assert_equal(true, Str.check(Object('')));
-                $mol_assert_equal(true, Str.check(''));
-                $mol_assert_equal(true, Object('') instanceof Str);
-            },
-            "Schema instance schema"($) {
-                const Str = $mol_schema_instance($mol_schema_instance(String));
-                $mol_assert_equal('$mol_schema_instance<String>', Str + '', $mol_key(Str));
-                $mol_assert_equal(true, Str.check(Object('')));
-                $mol_assert_equal(true, Str.check(''));
-                $mol_assert_equal(true, Object('') instanceof Str);
-            },
-        });
-    })($$ = $_1.$$ || ($_1.$$ = {}));
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($_1) {
-    var $$;
-    (function ($$) {
-        $mol_test({
             "Boolean schema"($) {
                 $mol_assert_equal('$mol_schema_boolean', $mol_schema_boolean + '', $mol_key($mol_schema_boolean));
                 $mol_assert_equal(true, $mol_schema_boolean.check(false));
@@ -33188,28 +33263,6 @@ var $;
                 $mol_assert_equal(false, $mol_schema_boolean.cast('true'));
                 $mol_assert_equal(false, $mol_schema_boolean.guard(false));
                 $mol_assert_fail(() => $mol_schema_boolean.guard(null), 'Wrong type');
-            },
-        });
-    })($$ = $_1.$$ || ($_1.$$ = {}));
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($_1) {
-    var $$;
-    (function ($$) {
-        $mol_test({
-            "Float schema"($) {
-                $mol_assert_equal('$mol_schema_float', $mol_schema_float + '', $mol_key($mol_schema_float));
-                $mol_assert_equal(true, $mol_schema_float.check(0));
-                $mol_assert_equal(true, $mol_schema_float.check(Number.NaN));
-                $mol_assert_equal(true, $mol_schema_float.check(Number.POSITIVE_INFINITY));
-                $mol_assert_equal(false, $mol_schema_float.check(null));
-                $mol_assert_equal(1.5, $mol_schema_float.cast(1.5));
-                $mol_assert_equal(Number.NaN, $mol_schema_float.cast('0'));
-                $mol_assert_equal(Number.EPSILON, $mol_schema_float.guard(Number.EPSILON));
-                $mol_assert_fail(() => $mol_schema_float.guard('0'), 'Wrong type');
             },
         });
     })($$ = $_1.$$ || ($_1.$$ = {}));
@@ -33257,26 +33310,6 @@ var $;
                 $mol_assert_equal(1n, $mol_schema_bigint.cast(1));
                 $mol_assert_equal(0n, $mol_schema_bigint.guard(0n));
                 $mol_assert_fail(() => $mol_schema_bigint.guard(1), 'Wrong type');
-            },
-        });
-    })($$ = $_1.$$ || ($_1.$$ = {}));
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
-(function ($_1) {
-    var $$;
-    (function ($$) {
-        $mol_test({
-            "String schema"($) {
-                $mol_assert_equal('$mol_schema_string', $mol_schema_string + '', $mol_key($mol_schema_string));
-                $mol_assert_equal(true, $mol_schema_string.check('foo'));
-                $mol_assert_equal(false, $mol_schema_string.check(123));
-                $mol_assert_equal('foo', $mol_schema_string.cast('foo'));
-                $mol_assert_equal('', $mol_schema_string.cast(123));
-                $mol_assert_equal('foo', $mol_schema_string.guard('foo'));
-                $mol_assert_fail(() => $mol_schema_string.guard(123), 'Wrong type');
             },
         });
     })($$ = $_1.$$ || ($_1.$$ = {}));
@@ -33391,35 +33424,6 @@ var $;
 ;
 "use strict";
 var $;
-(function ($_1) {
-    var $$;
-    (function ($$) {
-        $mol_test({
-            "Cache of maybe schema"($) {
-                $mol_assert_equal($mol_schema_maybe($mol_schema_float), $mol_schema_maybe($mol_schema_float));
-                $mol_assert_unique($mol_schema_maybe($mol_schema_float), $mol_schema_maybe($mol_schema_string));
-            },
-            "Optional value"($) {
-                const Config = $mol_schema_maybe($mol_schema_string);
-                $mol_assert_equal('$mol_schema_maybe<$mol_schema_string>', Config + '');
-                $mol_assert_equal(true, Config.check('foo'));
-                $mol_assert_equal(true, Config.check(undefined));
-                $mol_assert_equal(true, Config.check(null));
-                $mol_assert_equal(false, Config.check(0));
-                $mol_assert_equal('foo', Config.cast('foo'));
-                $mol_assert_equal(undefined, Config.cast(undefined));
-                $mol_assert_equal(null, Config.cast(null));
-                $mol_assert_equal(null, Config.cast(0));
-                $mol_assert_equal('foo', Config.guard('foo'));
-                $mol_assert_fail(() => Config.guard(123), 'Wrong type');
-            },
-        });
-    })($$ = $_1.$$ || ($_1.$$ = {}));
-})($ || ($ = {}));
-
-;
-"use strict";
-var $;
 (function ($) {
     $.$mol_schema_enum = $mol_memo_key.func(function $mol_schema_enum(Options) {
         return class $mol_schema_enum_ extends $mol_schema_any {
@@ -33434,9 +33438,9 @@ var $;
                     return value;
                 return $mol_fail(new TypeError('Wrong option', { cause: { value, schema: this } }));
             }
-            static cast(val) {
-                if (this.check(val))
-                    return val;
+            static cast(value) {
+                if (this.check(value))
+                    return value;
                 return Options[0];
             }
             static default = Options[0];
@@ -33623,7 +33627,7 @@ var $;
             const list1 = land1.Pawn($giper_baza_list).Data();
             const list2 = land2.Pawn($giper_baza_list).Data();
             list1.items_vary(['foo', 'xxx']);
-            land2.faces.tick();
+            land2.tick();
             list2.items_vary(['foo', 'yyy']);
             await $mol_wire_async(land1).units_steal(land2);
             $mol_assert_equal(list1.items_vary(), ['foo', 'yyy', 'foo', 'xxx']);
@@ -33826,6 +33830,25 @@ var $;
             sync(left, right);
             $mol_assert_equal(left.Data($giper_baza_list).items_vary(), right.Data($giper_baza_list).items_vary(), [1, 4, 5, 2, 3, 7, 6]);
         }),
+        async '3 transactions in same second must keep ordering'($) {
+            const auth_left = $.$giper_baza_auth.grab();
+            const auth_right = $.$giper_baza_auth.grab();
+            const land_left = $.$giper_baza_land.make({ $, auth: () => auth_left });
+            land_left.give(auth_right.pass(), $giper_baza_rank_post('just'));
+            const land_right = $.$giper_baza_land.make({ $, auth: () => auth_right, link: () => land_left.link() });
+            const list_left = land_left.Data($giper_baza_list);
+            const list_right = land_right.Data($giper_baza_list);
+            list_left.items_vary(['a', 'b', 'c', 'd']);
+            $mol_assert_equal(list_left.items_vary(), ['a', 'b', 'c', 'd']);
+            await $mol_wire_async(land_right).units_steal(land_left);
+            $mol_assert_equal(list_right.items_vary(), ['a', 'b', 'c', 'd']);
+            list_right.splice(['x'], 0, 0);
+            $mol_assert_equal(list_right.items_vary(), ['x', 'a', 'b', 'c', 'd']);
+            await $mol_wire_async(land_left).units_steal(land_right);
+            $mol_assert_equal(list_left.items_vary(), ['x', 'a', 'b', 'c', 'd']);
+            list_left.items_vary(['d', 'x', 'a', 'b', 'c']);
+            $mol_assert_equal(list_left.items_vary(), ['d', 'x', 'a', 'b', 'c']);
+        },
     });
 })($ || ($ = {}));
 
@@ -33861,12 +33884,12 @@ var $;
                 const dict1 = land1.Pawn($giper_baza_dict).Data();
                 const dict2 = land2.Pawn($giper_baza_dict).Data();
                 dict1.dive(123, $giper_baza_atom, null).vary(666);
-                land2.faces.tick();
+                land2.tick();
                 dict2.dive(123, $giper_baza_atom, null).vary(777);
                 await $mol_wire_async(land1).units_steal(land2);
                 $mol_assert_equal(dict1.dive(123, $giper_baza_atom).vary(), 777);
                 dict1.dive('xxx', $giper_baza_list, null).items_vary(['foo']);
-                land2.faces.tick();
+                land2.tick();
                 dict2.dive('xxx', $giper_baza_list, null).items_vary(['bar']);
                 await $mol_wire_async(land1).units_steal(land2);
                 $mol_assert_equal(dict1.dive('xxx', $giper_baza_list).items_vary(), ['bar', 'foo']);
@@ -34053,6 +34076,438 @@ var $;
         $giper_baza_glob.Seed();
         return ['http://localhost:9090/'];
     };
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    function check(str, query) {
+        $mol_assert_like(str, $hyoo_harp_to_string(query));
+        $mol_assert_like(query, $hyoo_harp_from_string(str));
+    }
+    $mol_test({
+        'root'() {
+            check('', {});
+        },
+        'only field'() {
+            check('user%3D777', {
+                'user=777': {},
+            });
+        },
+        'primary key'() {
+            check('user=jin%2C777!=', {
+                user: {
+                    '=': [['jin,777!']],
+                },
+            });
+        },
+        'single fetch'() {
+            check('friend(age%24)', {
+                friend: {
+                    age$: {},
+                },
+            });
+        },
+        'fetch and primary key'() {
+            check('user=jin()=(friend)', {
+                'user': {
+                    '=': [['jin()']],
+                    friend: {},
+                },
+            });
+        },
+        'multiple fetch'() {
+            check('age;friend', {
+                age: {},
+                friend: {},
+            });
+        },
+        'common query string back compatible'() {
+            $mol_assert_like($hyoo_harp_from_string('user=jin&age=100500'), {
+                user: {
+                    '=': [['jin']],
+                },
+                age: {
+                    '=': [['100500']],
+                },
+            });
+        },
+        'common pathname back compatible'() {
+            $mol_assert_like($hyoo_harp_from_string('users/jin/comments'), {
+                users: {},
+                jin: {},
+                comments: {},
+            });
+        },
+        'deep fetch'() {
+            check('my(friend(age);name);stat', {
+                my: {
+                    friend: {
+                        age: {},
+                    },
+                    name: {},
+                },
+                stat: {},
+            });
+        },
+        'orders'() {
+            check('+age;-name', {
+                age: {
+                    '+': true
+                },
+                name: {
+                    '+': false
+                },
+            });
+        },
+        'filter types'() {
+            check('sex=female=;status!=married=', {
+                sex: {
+                    '=': [['female']],
+                },
+                status: {
+                    '!=': [['married']],
+                },
+            });
+        },
+        'filter ranges'() {
+            check('sex=female=;age=18@25=;weight=@50=;height=150@=;hobby=paint=singing=', {
+                sex: {
+                    '=': [['female']],
+                },
+                age: {
+                    '=': [['18', '25']],
+                },
+                weight: {
+                    '=': [['', '50']],
+                },
+                height: {
+                    '=': [['150', '']],
+                },
+                hobby: {
+                    '=': [['paint'], ['singing']],
+                },
+            });
+        },
+        'unescaped values'() {
+            $mol_assert_like($hyoo_harp_from_string('foo=jin=777=;bar=jin!=666='), {
+                foo: {
+                    '=': [['jin'], ['777']],
+                },
+                bar: {
+                    '=': [['jin!'], ['666']],
+                },
+            });
+        },
+        'slicing'() {
+            check('friend(_num=0@100=)', {
+                friend: {
+                    _num: { '=': [['0', '100']] },
+                },
+            });
+        },
+        'complex'() {
+            check('pullRequest(state=closed=merged=;+repository(name;private);-updateTime;_num=0@100=)', {
+                pullRequest: {
+                    state: {
+                        '=': [
+                            ['closed'],
+                            ['merged'],
+                        ]
+                    },
+                    repository: {
+                        '+': true,
+                        name: {},
+                        private: {},
+                    },
+                    updateTime: {
+                        '+': false,
+                    },
+                    _num: {
+                        '=': [['0', '100']],
+                    },
+                },
+            });
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    $mol_test({
+        'Is string'() {
+            $mol_data_string('');
+        },
+        'Is not string'() {
+            $mol_assert_fail(() => {
+                $mol_data_string(0);
+            }, '0 is not a string');
+        },
+        'Is object string'() {
+            $mol_assert_fail(() => {
+                $mol_data_string(new String('x'));
+            }, 'x is not a string');
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    $mol_test({
+        'Is first'() {
+            $mol_data_variant($mol_data_number, $mol_data_string)(0);
+        },
+        'Is second'() {
+            $mol_data_variant($mol_data_number, $mol_data_string)('');
+        },
+        'Is false'() {
+            $mol_assert_fail(() => {
+                $mol_data_variant($mol_data_number, $mol_data_string)(false);
+            }, 'false is not any of variants');
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    const Age = $mol_data_optional($mol_data_number);
+    const Age_or_zero = $mol_data_optional($mol_data_number, () => 0);
+    $mol_test({
+        'Is not present'() {
+            $mol_assert_equal(Age(undefined), undefined);
+        },
+        'Is present'() {
+            $mol_assert_equal(Age(0), 0);
+        },
+        'Fallbacked'() {
+            $mol_assert_equal(Age_or_zero(undefined), 0);
+        },
+        'Is null'() {
+            $mol_assert_fail(() => Age(null), 'null is not a number');
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+
+;
+"use strict";
+var $;
+(function ($) {
+    $mol_test({
+        'Fit to record'() {
+            const User = $mol_data_record({ age: $mol_data_number });
+            User({ age: 0 });
+        },
+        'Extends record'() {
+            const User = $mol_data_record({ age: $mol_data_number });
+            User({ age: 0, name: 'Jin' });
+        },
+        // 'Recursive record' () {
+        // 	const User = $mol_data_record({
+        // 		name : $mol_data_string ,
+        // 		get kids() { return $mol_data_array( User ) } ,
+        // 	})
+        // 	User({
+        // 		name : 'Jin' ,
+        // 		kids : [
+        // 			{
+        // 				name : 'John' ,
+        // 				kids : [] ,
+        // 			}
+        // 		] ,
+        // 	})
+        // } ,
+        'Shrinks record'() {
+            $mol_assert_fail(() => {
+                const User = $mol_data_record({ age: $mol_data_number, name: $mol_data_string });
+                User({ age: 0 });
+            }, '["name"] undefined is not a string');
+        },
+        'Shrinks deep record'() {
+            $mol_assert_fail(() => {
+                const User = $mol_data_record({ wife: $mol_data_record({ age: $mol_data_number }) });
+                User({ wife: {} });
+            }, '["wife"] ["age"] undefined is not a number');
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    $mol_test({
+        'Is empty array'() {
+            $mol_data_array($mol_data_number)([]);
+        },
+        'Is array'() {
+            $mol_data_array($mol_data_number)([1, 2]);
+        },
+        'Is not array'() {
+            $mol_assert_fail(() => {
+                $mol_data_array($mol_data_number)({ [0]: 1, length: 1, map: () => { } });
+            }, '[object Object] is not an array');
+        },
+        'Has wrong item'() {
+            $mol_assert_fail(() => {
+                $mol_data_array($mol_data_number)([1, '1']);
+            }, '[1] 1 is not a number');
+        },
+        'Has wrong deep item'() {
+            $mol_assert_fail(() => {
+                $mol_data_array($mol_data_array($mol_data_number))([[], [0, 0, false]]);
+            }, '[1] [2] false is not a number');
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    $mol_test({
+        'Is boolean - true'() {
+            $mol_data_boolean(true);
+        },
+        'Is boolean - false'() {
+            $mol_data_boolean(false);
+        },
+        'Is not boolean'() {
+            $mol_assert_fail(() => {
+                $mol_data_boolean('x');
+            }, 'x is not a boolean');
+        },
+        'Is object boolean'() {
+            $mol_assert_fail(() => {
+                $mol_data_boolean(new Boolean(''));
+            }, 'false is not a boolean');
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($) {
+    $mol_test({
+        'type safe build & parse'() {
+            let States;
+            (function (States) {
+                States["opened"] = "opened";
+                States["closed"] = "closed";
+            })(States || (States = {}));
+            const State = $hyoo_harp_scheme({}, $mol_data_enum('States', States));
+            const Str = $hyoo_harp_scheme({}, $mol_data_string);
+            const Bool = $hyoo_harp_scheme({}, $mol_data_boolean);
+            const Repository = $hyoo_harp_scheme({
+                name: $mol_data_optional(Str),
+                isPrivate: $mol_data_optional(Bool),
+                // pullRequests: PullRequest,
+            });
+            const PullRequest = $hyoo_harp_scheme({
+                state: $mol_data_optional(State),
+                updated_at: $mol_data_optional(Str),
+                repository: $mol_data_optional(Repository),
+            });
+            const Request = $hyoo_harp_scheme({
+                pullRequest: $mol_data_optional(PullRequest),
+            });
+            const uri = 'pullRequest(state=closed=;-updated_at;repository(name;isPrivate);_num=0@100=)';
+            let query = Request({
+                pullRequest: {
+                    state: { '=': [[States.closed]] }, // filter
+                    updated_at: { '+': false }, // order
+                    repository: {
+                        name: {},
+                        isPrivate: {},
+                    },
+                    _num: { '=': [[0, 100]] }, // slice
+                }
+            });
+            $mol_assert_like(uri, Request.build(query));
+            $mol_assert_like(query, Request.parse(uri));
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($_1) {
+    $mol_test({
+        'save and load buffers'($) {
+            const land = $giper_baza_land.make({ $ });
+            const file = land.Data($giper_baza_file);
+            const source = new Uint8Array(2 ** 15 + 1);
+            source[2 ** 15] = 255;
+            file.buffer(source);
+            $mol_assert_equal(file.chunks().length, 2);
+            $mol_assert_equal(file.buffer(), source);
+        },
+        async 'save and load blobs'($) {
+            const land = $giper_baza_land.make({ $ });
+            const file = land.Data($giper_baza_file);
+            const source = new Uint8Array(2 ** 16 + 1);
+            source[2 ** 16 + 1] = 255;
+            await $mol_wire_async(file).blob(new $mol_blob([source], { type: 'test/test' }));
+            $mol_assert_equal('test/test', file.blob().type);
+            $mol_assert_equal(source, new Uint8Array(await file.blob().arrayBuffer()));
+        },
+    });
+})($ || ($ = {}));
+
+;
+"use strict";
+var $;
+(function ($_1) {
+    var $$;
+    (function ($$) {
+        $mol_test({
+            'GET ?BAZA:file=<id> serves file from glob'($) {
+                const land = $.$giper_baza_glob.home().land();
+                const file = land.Pawn($giper_baza_file).Head(new $giper_baza_link('11111111'));
+                const content = $mol_charset_encode('# Hello');
+                file.buffer(content);
+                file.type('text/markdown');
+                const app = $giper_baza_app_node.make({ $ });
+                const res = [];
+                app.GET($mol_rest_message.make({
+                    method: () => 'GET',
+                    uri: () => new URL(`http://baza.giper.dev/?BAZA:file=${file.link().str};name=hello.md`),
+                    port: $mol_rest_port.make({
+                        send_code: code => res.push(code),
+                        send_type: type => res.push(type),
+                        send_bin: bin => res.push(bin),
+                    }),
+                }));
+                $mol_assert_equal(res, [200, 'application/octet-stream', content]);
+            },
+            'GET ?BAZA:file=<unknown> returns 404'($) {
+                const link = new $giper_baza_link('99999999_99999999');
+                const app = $giper_baza_app_node.make({ $ });
+                const res = [];
+                app.GET($mol_rest_message.make({
+                    method: () => 'GET',
+                    uri: () => new URL(`http://baza.giper.dev/?BAZA:file=${link.str};name=ghost.md`),
+                    port: $mol_rest_port.make({
+                        send_code: code => res.push(code),
+                        send_type: type => res.push(type),
+                        send_bin: bin => res.push(bin),
+                    }),
+                }));
+                $mol_assert_equal(res, [404, 'application/octet-stream', new Uint8Array]);
+            },
+        });
+    })($$ = $_1.$$ || ($_1.$$ = {}));
 })($ || ($ = {}));
 
 

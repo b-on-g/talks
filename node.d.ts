@@ -808,12 +808,24 @@ declare namespace $ {
     export type $mol_style_properties_color = 'aliceblue' | 'antiquewhite' | 'aqua' | 'aquamarine' | 'azure' | 'beige' | 'bisque' | 'black' | 'blanchedalmond' | 'blue' | 'blueviolet' | 'brown' | 'burlywood' | 'cadetblue' | 'chartreuse' | 'chocolate' | 'coral' | 'cornflowerblue' | 'cornsilk' | 'crimson' | 'cyan' | 'darkblue' | 'darkcyan' | 'darkgoldenrod' | 'darkgray' | 'darkgreen' | 'darkgrey' | 'darkkhaki' | 'darkmagenta' | 'darkolivegreen' | 'darkorange' | 'darkorchid' | 'darkred' | 'darksalmon' | 'darkseagreen' | 'darkslateblue' | 'darkslategrey' | 'darkturquoise' | 'darkviolet' | 'deeppink' | 'deepskyblue' | 'dimgray' | 'dimgrey' | 'dodgerblue' | 'firebrick' | 'floralwhite' | 'forestgreen' | 'fuchsia' | 'gainsboro' | 'ghostwhite' | 'gold' | 'goldenrod' | 'gray' | 'green' | 'greenyellow' | 'grey' | 'honeydew' | 'hotpink' | 'indianred' | 'indigo' | 'ivory' | 'khaki' | 'lavender' | 'lavenderblush' | 'lawngreen' | 'lemonchiffon' | 'lightblue' | 'lightcoral' | 'lightcyan' | 'lightgoldenrodyellow' | 'lightgray' | 'lightgreen' | 'lightgrey' | 'lightpink' | 'lightsalmon' | 'lightseagreen' | 'lightskyblue' | 'lightslategray' | 'lightslategrey' | 'lightsteelblue' | 'lightyellow' | 'lime' | 'limegreen' | 'linen' | 'magenta' | 'maroon' | 'mediumaquamarine' | 'mediumblue' | 'mediumorchid' | 'mediumpurple' | 'mediumseagreen' | 'mediumslateblue' | 'mediumspringgreen' | 'mediumturquoise' | 'mediumvioletred' | 'midnightblue' | 'mintcream' | 'mistyrose' | 'moccasin' | 'navajowhite' | 'navy' | 'oldlace' | 'olive' | 'olivedrab' | 'orange' | 'orangered' | 'orchid' | 'palegoldenrod' | 'palegreen' | 'paleturquoise' | 'palevioletred' | 'papayawhip' | 'peachpuff' | 'peru' | 'pink' | 'plum' | 'powderblue' | 'purple' | 'rebeccapurple' | 'red' | 'rosybrown' | 'royalblue' | 'saddlebrown' | 'salmon' | 'sandybrown' | 'seagreen' | 'seashell' | 'sienna' | 'silver' | 'skyblue' | 'slateblue' | 'slategray' | 'slategrey' | 'snow' | 'springgreen' | 'steelblue' | 'tan' | 'teal' | 'thistle' | 'tomato' | 'turquoise' | 'violet' | 'wheat' | 'white' | 'whitesmoke' | 'yellow' | 'yellowgreen' | 'transparent' | 'currentcolor' | $mol_style_func<'hsla' | 'rgba' | 'var'> | `#${string}` | `hsl(${Space}${Angle} ${Portion} ${Portion}${'' | `${Space}/${Space}${Portion}`}${Space})`;
     type Length = 0 | `${number}${$mol_style_unit_length}` | $mol_style_func<'calc' | 'var' | 'clamp'>;
     type Size = 'auto' | 'max-content' | 'min-content' | 'fit-content' | Length | Common;
-    type Directions<Value> = Value | readonly [Value, Value] | {
+    type Sides<Value> = {
         top?: Value;
         right?: Value;
         bottom?: Value;
         left?: Value;
+        blockStart?: Value;
+        blockEnd?: Value;
+        inlineStart?: Value;
+        inlineEnd?: Value;
     };
+    type Directions<Value> = Value | readonly [Value, Value] | Sides<Value>;
+    type Edges<Value> = {
+        topLeft?: Value;
+        topRight?: Value;
+        bottomLeft?: Value;
+        bottomRight?: Value;
+    };
+    type Borders<Value> = Value | readonly [Value, Value] | (Sides<Value> & Edges<Value>);
     type Single_animation_composition = 'replace' | 'add' | 'accumulate';
     type Single_animation_direction = 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
     type Single_animation_fill_mode = 'none' | 'forwards' | 'backwards' | 'both';
@@ -1193,7 +1205,7 @@ declare namespace $ {
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/left */
         left?: Length | 'auto' | Common;
         /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/border */
-        border?: Directions<{
+        border?: Borders<{
             /**
              * Rounds the corners of an element's outer border edge. You can set a single radius to make circular corners, or two radii to make elliptical corners.
              * @see https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius
@@ -2464,6 +2476,7 @@ declare namespace $ {
     class $mol_locale extends $mol_object {
         static lang_default(): string;
         static lang(next?: string): string;
+        static direction(): "ltr" | "rtl";
         static source(lang: string): any;
         static texts(lang: string, next?: $mol_locale_dict): $mol_locale_dict;
         static text(key: string): string;
@@ -4046,9 +4059,17 @@ declare namespace $ {
 
 //# sourceMappingURL=off.view.tree.d.ts.map
 declare namespace $ {
+    function $mol_dom_safe_uri(uri: string): string;
+    function $mol_dom_safe_attr(val: string): string;
+    let $mol_dom_safe_rules: Record<string, Record<string, (val: string) => string>>;
+    function $mol_dom_safe(this: $, nodes: ChildNode[]): ChildNode[];
+}
+
+declare namespace $ {
 
 	export class $mol_link extends $mol_view {
 		uri_toggle( ): string
+		uri_unsafe( ): ReturnType< $mol_link['uri_toggle'] >
 		hint( ): string
 		hint_safe( ): ReturnType< $mol_link['hint'] >
 		target( ): string
@@ -4063,7 +4084,7 @@ declare namespace $ {
 		uri_native( ): any
 		external( ): boolean
 		attr( ): ({ 
-			'href': ReturnType< $mol_link['uri_toggle'] >,
+			'href': ReturnType< $mol_link['uri_unsafe'] >,
 			'title': ReturnType< $mol_link['hint_safe'] >,
 			'target': ReturnType< $mol_link['target'] >,
 			'download': ReturnType< $mol_link['file_name'] >,
@@ -4096,6 +4117,7 @@ declare namespace $.$$ {
         external(): boolean;
         target(): '_self' | '_blank' | '_top' | '_parent' | string;
         hint_safe(): string;
+        uri_unsafe(): string;
     }
 }
 
@@ -4442,8 +4464,8 @@ declare namespace $ {
 declare namespace $ {
     class $mol_time_base {
         static patterns: Record<string, (arg: any) => string>;
-        static formatter(pattern: string): (arg: any) => string;
-        toString(pattern: string): string;
+        static formatter(pattern: string): (arg: any, lang?: string) => string;
+        toString(pattern: string, lang?: string): string;
     }
 }
 
@@ -4545,25 +4567,27 @@ declare namespace $ {
         toOffset(config?: $mol_time_duration_config): $mol_time_moment;
         valueOf(): number;
         toJSON(): string;
-        toString(pattern?: string): string;
+        toString(pattern?: string, lang?: string): string;
         toArray(): readonly [number | undefined, number | undefined, number | undefined, number | undefined, number | undefined, number | undefined, number | undefined];
         [Symbol.toPrimitive](mode: 'default' | 'number' | 'string'): string | number;
         [$mol_dev_format_head](): any[];
+        protected static formatters: Record<string, Record<string, Intl.DateTimeFormat>>;
+        static intl(lang: string | undefined, pattern: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat;
         static patterns: {
             YYYY: (moment: $mol_time_moment) => string;
             AD: (moment: $mol_time_moment) => string;
             YY: (moment: $mol_time_moment) => string;
-            Month: (moment: $mol_time_moment) => string;
-            'DD Month': (moment: $mol_time_moment) => string;
-            'D Month': (moment: $mol_time_moment) => string;
-            Mon: (moment: $mol_time_moment) => string;
-            'DD Mon': (moment: $mol_time_moment) => string;
-            'D Mon': (moment: $mol_time_moment) => string;
+            Month: (moment: $mol_time_moment, lang?: string) => string;
+            'DD Month': (moment: $mol_time_moment, lang?: string) => string;
+            'D Month': (moment: $mol_time_moment, lang?: string) => string;
+            Mon: (moment: $mol_time_moment, lang?: string) => string;
+            'DD Mon': (moment: $mol_time_moment, lang?: string) => string;
+            'D Mon': (moment: $mol_time_moment, lang?: string) => string;
             '-MM': (moment: $mol_time_moment) => string;
             MM: (moment: $mol_time_moment) => string;
             M: (moment: $mol_time_moment) => string;
-            WeekDay: (moment: $mol_time_moment) => string;
-            WD: (moment: $mol_time_moment) => string;
+            WeekDay: (moment: $mol_time_moment, lang?: string) => string;
+            WD: (moment: $mol_time_moment, lang?: string) => string;
             '-DD': (moment: $mol_time_moment) => string;
             DD: (moment: $mol_time_moment) => string;
             D: (moment: $mol_time_moment) => string;
@@ -4791,10 +4815,14 @@ declare namespace $ {
 		ReturnType< $mol_view['sub'] >
 	>
 	export class $mol_form_field extends $mol_labeler {
+		state( ): string | null
 		name( ): string
 		bid( ): string
 		Bid( ): $mol_view
 		control( ): any
+		attr( ): ({ 
+			'mol_form_field_state': ReturnType< $mol_form_field['state'] >,
+		})  & ReturnType< $mol_labeler['attr'] >
 		bids( ): readonly(string)[]
 		label( ): readonly(any)[]
 		content( ): readonly(any)[]
@@ -4808,6 +4836,7 @@ declare namespace $.$$ {
      * @see https://mol.hyoo.ru/#!section=demos/demo=mol_form_demo
      */
     class $mol_form_field extends $.$mol_form_field {
+        state(): string | null;
         bid(): string;
     }
 }
@@ -6996,6 +7025,7 @@ declare namespace $ {
         float32(offset: number, next?: number): number;
         /** 8-byte float little-endian channel for offset. */
         float64(offset: number, next?: number): number;
+        mix(mixin: Uint8Array<ArrayBuffer>): this;
         /** A Uint8Array view for the same buffer. */
         asArray(): Uint8Array<ArrayBuffer>;
         /** base64ae string from buffer. */
@@ -7059,8 +7089,160 @@ declare namespace $ {
 }
 
 declare namespace $ {
-    /** @deprecated Use $mol_crypto2_hash */
-    let $mol_crypto_hash: typeof $mol_crypto2_hash;
+    class $mol_memo_key extends $mol_wrapper {
+        static wrap<This extends object, Key, Value>(task: (this: This, key: Key, next?: Value) => Value): (this: This, key: Key, next?: Value) => Value | undefined;
+    }
+}
+
+declare namespace $ {
+    class $mol_schema_any extends Object {
+        static [Symbol.toStringTag]: string;
+        static [$mol_key_handle](): string;
+        /** Short user-readable identity. */
+        static toString(): string;
+        /** Type-predicate that checks value by schema. */
+        static check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This['default'];
+        /** `instanceof` support */
+        static [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This['default'];
+        /** Type-parser that fails of wrong values. */
+        static guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This['default'];
+        /** Type-caster that normalizes wrong values. */
+        static cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This['default'];
+        /** Default value which conforms schema. */
+        static default: unknown;
+    }
+}
+
+declare namespace $ {
+    let $mol_schema_maybe: <Some extends typeof $mol_schema_any>(this: void, Some: Some) => {
+        new (value?: any): {
+            constructor: Function;
+            toString(): string;
+            toLocaleString(): string;
+            valueOf(): Object;
+            hasOwnProperty(v: PropertyKey): boolean;
+            isPrototypeOf(v: Object): boolean;
+            propertyIsEnumerable(v: PropertyKey): boolean;
+        };
+        Some: Some;
+        toString(): string;
+        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+        default: Some["default"] | null;
+        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+        [Symbol.toStringTag]: string;
+        [$mol_key_handle](): string;
+        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+        getPrototypeOf(o: any): any;
+        getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+        getOwnPropertyNames(o: any): string[];
+        create(o: object | null): any;
+        create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+        defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
+        defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
+        seal<T>(o: T): T;
+        freeze<T extends Function>(f: T): T;
+        freeze<T extends {
+            [idx: string]: U | null | undefined | object;
+        }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
+        freeze<T>(o: T): Readonly<T>;
+        preventExtensions<T>(o: T): T;
+        isSealed(o: any): boolean;
+        isFrozen(o: any): boolean;
+        isExtensible(o: any): boolean;
+        keys(o: object): string[];
+        keys(o: {}): string[];
+        assign<T extends {}, U_1>(target: T, source: U_1): T & U_1;
+        assign<T extends {}, U_2, V>(target: T, source1: U_2, source2: V): T & U_2 & V;
+        assign<T extends {}, U_3, V_1, W>(target: T, source1: U_3, source2: V_1, source3: W): T & U_3 & V_1 & W;
+        assign(target: object, ...sources: any[]): any;
+        getOwnPropertySymbols(o: any): symbol[];
+        is(value1: any, value2: any): boolean;
+        setPrototypeOf(o: any, proto: object | null): any;
+        values<T>(o: {
+            [s: string]: T;
+        } | ArrayLike<T>): T[];
+        values(o: {}): any[];
+        entries<T>(o: {
+            [s: string]: T;
+        } | ArrayLike<T>): [string, T][];
+        entries(o: {}): [string, any][];
+        getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
+            [x: string]: PropertyDescriptor;
+        };
+        fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
+            [k: string]: T;
+        };
+        fromEntries(entries: Iterable<readonly any[]>): any;
+        hasOwn(o: object, v: PropertyKey): boolean;
+        groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+    };
+}
+
+declare namespace $ {
+    let $mol_schema_instance: <Class extends new (...args: any[]) => any>(this: void, Class: Class) => Class extends typeof $mol_schema_any ? Class : {
+        new (value?: any): {
+            constructor: Function;
+            toString(): string;
+            toLocaleString(): string;
+            valueOf(): Object;
+            hasOwnProperty(v: PropertyKey): boolean;
+            isPrototypeOf(v: Object): boolean;
+            propertyIsEnumerable(v: PropertyKey): boolean;
+        };
+        Class: Class;
+        toString(): string;
+        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+        default: InstanceType<Class>;
+        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+        [Symbol.toStringTag]: string;
+        [$mol_key_handle](): string;
+        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+        getPrototypeOf(o: any): any;
+        getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+        getOwnPropertyNames(o: any): string[];
+        create(o: object | null): any;
+        create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+        defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
+        defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
+        seal<T>(o: T): T;
+        freeze<T extends Function>(f: T): T;
+        freeze<T extends {
+            [idx: string]: U | null | undefined | object;
+        }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
+        freeze<T>(o: T): Readonly<T>;
+        preventExtensions<T>(o: T): T;
+        isSealed(o: any): boolean;
+        isFrozen(o: any): boolean;
+        isExtensible(o: any): boolean;
+        keys(o: object): string[];
+        keys(o: {}): string[];
+        assign<T extends {}, U_1>(target: T, source: U_1): T & U_1;
+        assign<T extends {}, U_2, V>(target: T, source1: U_2, source2: V): T & U_2 & V;
+        assign<T extends {}, U_3, V_1, W>(target: T, source1: U_3, source2: V_1, source3: W): T & U_3 & V_1 & W;
+        assign(target: object, ...sources: any[]): any;
+        getOwnPropertySymbols(o: any): symbol[];
+        is(value1: any, value2: any): boolean;
+        setPrototypeOf(o: any, proto: object | null): any;
+        values<T>(o: {
+            [s: string]: T;
+        } | ArrayLike<T>): T[];
+        values(o: {}): any[];
+        entries<T>(o: {
+            [s: string]: T;
+        } | ArrayLike<T>): [string, T][];
+        entries(o: {}): [string, any][];
+        getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
+            [x: string]: PropertyDescriptor;
+        };
+        fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
+            [k: string]: T;
+        };
+        fromEntries(entries: Iterable<readonly any[]>): any;
+        hasOwn(o: object, v: PropertyKey): boolean;
+        groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+    };
 }
 
 declare namespace $ {
@@ -7104,6 +7286,131 @@ declare namespace $ {
         mix(mixin: Uint8Array<ArrayBuffer> | $giper_baza_link): Uint8Array<ArrayBuffer>;
     }
     function $giper_baza_link_base<Res>(base: $giper_baza_link, task: () => Res): Res;
+    let $giper_baza_link_schema: {
+        new (value?: any): {
+            constructor: Function;
+            toString(): string;
+            toLocaleString(): string;
+            valueOf(): Object;
+            hasOwnProperty(v: PropertyKey): boolean;
+            isPrototypeOf(v: Object): boolean;
+            propertyIsEnumerable(v: PropertyKey): boolean;
+        };
+        Some: {
+            new (value?: any): {
+                constructor: Function;
+                toString(): string;
+                toLocaleString(): string;
+                valueOf(): Object;
+                hasOwnProperty(v: PropertyKey): boolean;
+                isPrototypeOf(v: Object): boolean;
+                propertyIsEnumerable(v: PropertyKey): boolean;
+            };
+            Class: typeof $giper_baza_link;
+            toString(): string;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+            default: $giper_baza_link;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
+            [Symbol.toStringTag]: string;
+            [$mol_key_handle](): string;
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
+            getPrototypeOf(o: any): any;
+            getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+            getOwnPropertyNames(o: any): string[];
+            create(o: object | null): any;
+            create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+            defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
+            defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
+            seal<T>(o: T): T;
+            freeze<T extends Function>(f: T): T;
+            freeze<T extends {
+                [idx: string]: U | null | undefined | object;
+            }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
+            freeze<T>(o: T): Readonly<T>;
+            preventExtensions<T>(o: T): T;
+            isSealed(o: any): boolean;
+            isFrozen(o: any): boolean;
+            isExtensible(o: any): boolean;
+            keys(o: object): string[];
+            keys(o: {}): string[];
+            assign<T extends {}, U>(target: T, source: U): T & U;
+            assign<T extends {}, U, V>(target: T, source1: U, source2: V): T & U & V;
+            assign<T extends {}, U, V, W>(target: T, source1: U, source2: V, source3: W): T & U & V & W;
+            assign(target: object, ...sources: any[]): any;
+            getOwnPropertySymbols(o: any): symbol[];
+            is(value1: any, value2: any): boolean;
+            setPrototypeOf(o: any, proto: object | null): any;
+            values<T>(o: {
+                [s: string]: T;
+            } | ArrayLike<T>): T[];
+            values(o: {}): any[];
+            entries<T>(o: {
+                [s: string]: T;
+            } | ArrayLike<T>): [string, T][];
+            entries(o: {}): [string, any][];
+            getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
+                [x: string]: PropertyDescriptor;
+            };
+            fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
+                [k: string]: T;
+            };
+            fromEntries(entries: Iterable<readonly any[]>): any;
+            hasOwn(o: object, v: PropertyKey): boolean;
+            groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+        };
+        toString(): string;
+        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+        default: $giper_baza_link | null;
+        check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
+        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+        [Symbol.toStringTag]: string;
+        [$mol_key_handle](): string;
+        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
+        getPrototypeOf(o: any): any;
+        getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+        getOwnPropertyNames(o: any): string[];
+        create(o: object | null): any;
+        create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+        defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
+        defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
+        seal<T>(o: T): T;
+        freeze<T extends Function>(f: T): T;
+        freeze<T extends {
+            [idx: string]: U | null | undefined | object;
+        }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
+        freeze<T>(o: T): Readonly<T>;
+        preventExtensions<T>(o: T): T;
+        isSealed(o: any): boolean;
+        isFrozen(o: any): boolean;
+        isExtensible(o: any): boolean;
+        keys(o: object): string[];
+        keys(o: {}): string[];
+        assign<T extends {}, U>(target: T, source: U): T & U;
+        assign<T extends {}, U, V>(target: T, source1: U, source2: V): T & U & V;
+        assign<T extends {}, U, V, W>(target: T, source1: U, source2: V, source3: W): T & U & V & W;
+        assign(target: object, ...sources: any[]): any;
+        getOwnPropertySymbols(o: any): symbol[];
+        is(value1: any, value2: any): boolean;
+        setPrototypeOf(o: any, proto: object | null): any;
+        values<T>(o: {
+            [s: string]: T;
+        } | ArrayLike<T>): T[];
+        values(o: {}): any[];
+        entries<T>(o: {
+            [s: string]: T;
+        } | ArrayLike<T>): [string, T][];
+        entries(o: {}): [string, any][];
+        getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
+            [x: string]: PropertyDescriptor;
+        };
+        fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
+            [k: string]: T;
+        };
+        fromEntries(entries: Iterable<readonly any[]>): any;
+        hasOwn(o: object, v: PropertyKey): boolean;
+        groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+    };
 }
 
 declare namespace $ {
@@ -7223,7 +7530,7 @@ declare namespace $ {
         static current(next?: $giper_baza_auth | null): $giper_baza_auth;
         static embryos: string[];
         static grab(): $giper_baza_auth;
-        static generate(): Promise<$giper_baza_auth>;
+        static _generate(): Promise<$giper_baza_auth>;
         pass(): $giper_baza_auth_pass;
         secret_mutual(pass: $giper_baza_auth_pass): $mol_crypto_sacred;
         [$mol_dev_format_head](): any[];
@@ -7448,7 +7755,7 @@ declare namespace $ {
         clone(): $giper_baza_face;
         get moment(): $mol_time_moment;
         get time_tick(): number;
-        sync_time(time: number, tick: number): void;
+        sync_time(time: number, tick: number): boolean;
         sync_summ(summ: number): void;
         toJSON(): string;
         [$mol_dev_format_head](): any[];
@@ -7457,6 +7764,7 @@ declare namespace $ {
     class $giper_baza_face_map extends Map<string, $giper_baza_face> {
         /** Cumulative face for all peers. */
         stat: $giper_baza_face;
+        _peer_last: string;
         constructor(entries?: $giper_baza_face_data);
         clone(): $giper_baza_face_map;
         /** Synchronize this clock with another. */
@@ -7467,7 +7775,7 @@ declare namespace $ {
         peer_summ(peer: string, summ: number): void;
         peer_summ_shift(peer: string, diff: number): void;
         /** Generates new time for peer that greater then other seen. */
-        tick(): $giper_baza_face;
+        tick(peer: $giper_baza_link): $giper_baza_face;
         toJSON(): {
             [k: string]: $giper_baza_face;
         };
@@ -7670,65 +7978,6 @@ declare namespace $ {
         [key in string]: $giper_baza_vary_type;
     }>;
     let $giper_baza_vary: $mol_vary_class;
-    function $giper_baza_vary_switch<Ways extends {
-        none: (vary: null) => any;
-        blob: (vary: ArrayBufferView<ArrayBuffer>) => any;
-        bool: (vary: boolean) => any;
-        bint: (vary: bigint) => any;
-        real: (vary: number) => any;
-        link: (vary: $giper_baza_link) => any;
-        text: (vary: string) => any;
-        time: (vary: $mol_time_moment) => any;
-        dura: (vary: $mol_time_duration) => any;
-        span: (vary: $mol_time_interval) => any;
-        dict: (vary: {}) => any;
-        list: (vary: any[]) => any;
-        elem: (vary: Element) => any;
-        tree: (vary: $mol_tree2) => any;
-    }>(vary: $giper_baza_vary_type, ways: Ways): $mol_type_result<Ways[keyof Ways]>;
-}
-
-declare namespace $ {
-    function $mol_tree2_bin_to_bytes(tree: $mol_tree2): Uint8Array<ArrayBuffer>;
-    function $mol_tree2_bin_from_bytes(bytes: ArrayLike<number>, span?: $mol_span): $mol_tree2;
-    function $mol_tree2_bin_from_string(str: string, span?: $mol_span): $mol_tree2;
-}
-
-declare namespace $ {
-    function $mol_tree2_xml_from_dom(dom: Node): $mol_tree2;
-}
-
-/** @jsx $mol_jsx */
-declare namespace $ {
-    function $giper_baza_vary_cast_blob(vary: $giper_baza_vary_type): ArrayLike<number | bigint> | null;
-    function $giper_baza_vary_cast_bool(vary: $giper_baza_vary_type): boolean | null;
-    function $giper_baza_vary_cast_bint(vary: $giper_baza_vary_type): bigint | null;
-    function $giper_baza_vary_cast_real(vary: $giper_baza_vary_type): number | null;
-    function $giper_baza_vary_cast_link(vary: $giper_baza_vary_type): $giper_baza_link | null;
-    function $giper_baza_vary_cast_text(vary: $giper_baza_vary_type): string | null;
-    function $giper_baza_vary_cast_time(vary: $giper_baza_vary_type): $mol_time_moment | null;
-    function $giper_baza_vary_cast_dura(vary: $giper_baza_vary_type): $mol_time_duration | null;
-    function $giper_baza_vary_cast_span(vary: $giper_baza_vary_type): $mol_time_interval | null;
-    function $giper_baza_vary_cast_dict(vary: $giper_baza_vary_type): {} | null;
-    function $giper_baza_vary_cast_list(vary: $giper_baza_vary_type): readonly any[] | null;
-    function $giper_baza_vary_cast_elem(vary: $giper_baza_vary_type): Element | null;
-    function $giper_baza_vary_cast_tree(vary: $giper_baza_vary_type): $mol_tree2 | null;
-    const $giper_baza_vary_cast_funcs: {
-        readonly none: () => null;
-        readonly blob: typeof $giper_baza_vary_cast_blob;
-        readonly bool: typeof $giper_baza_vary_cast_bool;
-        readonly bint: typeof $giper_baza_vary_cast_bint;
-        readonly real: typeof $giper_baza_vary_cast_real;
-        readonly link: typeof $giper_baza_vary_cast_link;
-        readonly text: typeof $giper_baza_vary_cast_text;
-        readonly time: typeof $giper_baza_vary_cast_time;
-        readonly dura: typeof $giper_baza_vary_cast_dura;
-        readonly span: typeof $giper_baza_vary_cast_span;
-        readonly dict: typeof $giper_baza_vary_cast_dict;
-        readonly list: typeof $giper_baza_vary_cast_list;
-        readonly elem: typeof $giper_baza_vary_cast_elem;
-        readonly tree: typeof $giper_baza_vary_cast_tree;
-    };
 }
 
 declare namespace $ {
@@ -7758,6 +8007,7 @@ declare namespace $ {
         /** Auth Private key generated with Proof of Work  */
         auth(): $giper_baza_auth;
         faces: $giper_baza_face_map;
+        tick(): $giper_baza_face;
         _pass: $mol_wire_dict<string, $giper_baza_auth_pass>;
         _seal_item: $mol_wire_dict<string, $giper_baza_unit_seal>;
         _seal_shot: $mol_wire_dict<string, $giper_baza_unit_seal>;
@@ -7835,6 +8085,7 @@ declare namespace $ {
         sync_yard(): $mol_wire_atom<unknown, [], void>;
         bus(): $mol_bus<ArrayBuffer>;
         loading(): void;
+        sands_unencoded(): $giper_baza_unit_sand[];
         sand_encoding(): void;
         units_unsigned(): $giper_baza_unit_base[];
         units_signing(): void;
@@ -7929,6 +8180,8 @@ declare namespace $ {
     class $mol_rest_port extends $mol_object {
         send_code(code: $mol_rest_code): void;
         send_type(mime: $mol_rest_port_mime): void;
+        origin(): string;
+        address(): string;
         send_data(data: null | string | Uint8Array<ArrayBuffer> | Element | object): void;
         send_nil(): void;
         send_bin(data: Uint8Array<ArrayBuffer>): void;
@@ -7963,6 +8216,42 @@ declare namespace $ {
 }
 
 declare namespace $ {
+    class $mol_rest_message extends $mol_object {
+        port: $mol_rest_port;
+        method(): string;
+        uri(): URL;
+        type(): $mol_rest_port_mime;
+        origin(): string;
+        address(): string;
+        protocols(): readonly string[];
+        data(): null | string | Uint8Array<ArrayBuffer> | Element | object;
+        bin(): Uint8Array<ArrayBuffer>;
+        text(): string;
+        reply(data: null | string | Uint8Array<ArrayBuffer> | Element | object, meta?: {
+            type?: $mol_rest_port_mime;
+            code?: $mol_rest_code;
+        }): void;
+        route(uri: URL): $mol_rest_message;
+        derive(method: string, data: null | string | Uint8Array<ArrayBuffer> | Element | object): $mol_rest_message;
+        static make<This extends typeof $mol_object>(this: This, config: Partial<InstanceType<This>>): InstanceType<This>;
+    }
+}
+
+declare namespace $ {
+    class $mol_rest_message_http extends $mol_rest_message {
+        input: InstanceType<$node['http']['IncomingMessage']>;
+        method(): string;
+        uri(): URL;
+        type(): $mol_rest_port_mime;
+        origin(): string;
+        address(): string;
+        protocols(): string[];
+        data(): null | string | Uint8Array<ArrayBuffer> | Element | object;
+        route(uri: URL): $mol_rest_message_http;
+    }
+}
+
+declare namespace $ {
     enum $mol_websocket_frame_op {
         con = 0,
         txt = 1,
@@ -7977,6 +8266,7 @@ declare namespace $ {
      * Payload >= 2^32 isn't supported
      */
     class $mol_websocket_frame extends $mol_buffer {
+        /** Kind of socket frame. */
         kind(next?: {
             op: keyof typeof $mol_websocket_frame_op;
             fin: boolean;
@@ -7987,6 +8277,7 @@ declare namespace $ {
             op: "stop" | "con" | "txt" | "bin" | "ping" | "pong";
             fin: number;
         };
+        /** Payload info. */
         data(next?: {
             size: number;
             mask: boolean;
@@ -7997,7 +8288,9 @@ declare namespace $ {
             size: number;
             mask: number;
         };
+        /** Header size (2..14). */
         size(): number;
+        /** 4 byte mask. */
         mask(): Uint8Array<ArrayBuffer>;
         toString(): string;
         static make(op: keyof typeof $mol_websocket_frame_op, size?: number, mask?: boolean, fin?: boolean): $mol_websocket_frame;
@@ -8015,7 +8308,11 @@ declare namespace $ {
 
 declare namespace $ {
     class $mol_rest_port_ws_node extends $mol_rest_port_ws {
+        prolog: InstanceType<$node['http']['IncomingMessage']>;
         socket: InstanceType<$node['stream']['Duplex']>;
+        upgrade(): $mol_rest_message_http;
+        origin(): string;
+        address(): string;
         send_nil(): void;
         send_bin(data: Uint8Array<ArrayBuffer>): void;
         send_text(data: string): void;
@@ -8338,105 +8635,15 @@ declare namespace $ {
 }
 
 declare namespace $ {
-    class $mol_memo_key extends $mol_wrapper {
-        static wrap<This extends object, Key, Value>(task: (this: This, key: Key, next?: Value) => Value): (this: This, key: Key, next?: Value) => Value | undefined;
-    }
-}
-
-declare namespace $ {
-    class $mol_schema_any extends Object {
-        static [Symbol.toStringTag]: string;
-        static [$mol_key_handle](): string;
-        /** Short user-readable identity. */
-        static toString(): string;
-        /** Type-guard that checks value by schema. */
-        static check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This['default'];
-        static [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This['default'];
-        /** Strict parse. Fails of wrong values. */
-        static guard<Value>(value: Value): Value;
-        /** Relaxed cast. Normalizes wrong values. */
-        static cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This['default'];
-        /** Default value which conforms schema. */
-        static default: unknown;
-    }
-}
-
-declare namespace $ {
-    let $mol_schema_instance: <Class extends new (...args: any[]) => any>(this: void, Class: Class) => Class extends typeof $mol_schema_any ? Class : {
-        new (value?: any): {
-            constructor: Function;
-            toString(): string;
-            toLocaleString(): string;
-            valueOf(): Object;
-            hasOwnProperty(v: PropertyKey): boolean;
-            isPrototypeOf(v: Object): boolean;
-            propertyIsEnumerable(v: PropertyKey): boolean;
-        };
-        Class: Class;
-        toString(): string;
-        guard<Value>(value: Value): Value & InstanceType<Class>;
-        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
-        default: InstanceType<Class>;
-        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
-        [Symbol.toStringTag]: string;
-        [$mol_key_handle](): string;
-        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
-        getPrototypeOf(o: any): any;
-        getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
-        getOwnPropertyNames(o: any): string[];
-        create(o: object | null): any;
-        create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
-        defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
-        defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
-        seal<T>(o: T): T;
-        freeze<T extends Function>(f: T): T;
-        freeze<T extends {
-            [idx: string]: U | null | undefined | object;
-        }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
-        freeze<T>(o: T): Readonly<T>;
-        preventExtensions<T>(o: T): T;
-        isSealed(o: any): boolean;
-        isFrozen(o: any): boolean;
-        isExtensible(o: any): boolean;
-        keys(o: object): string[];
-        keys(o: {}): string[];
-        assign<T extends {}, U_1>(target: T, source: U_1): T & U_1;
-        assign<T extends {}, U_2, V>(target: T, source1: U_2, source2: V): T & U_2 & V;
-        assign<T extends {}, U_3, V_1, W>(target: T, source1: U_3, source2: V_1, source3: W): T & U_3 & V_1 & W;
-        assign(target: object, ...sources: any[]): any;
-        getOwnPropertySymbols(o: any): symbol[];
-        is(value1: any, value2: any): boolean;
-        setPrototypeOf(o: any, proto: object | null): any;
-        values<T>(o: {
-            [s: string]: T;
-        } | ArrayLike<T>): T[];
-        values(o: {}): any[];
-        entries<T>(o: {
-            [s: string]: T;
-        } | ArrayLike<T>): [string, T][];
-        entries(o: {}): [string, any][];
-        getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
-            [x: string]: PropertyDescriptor;
-        };
-        fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
-            [k: string]: T;
-        };
-        fromEntries(entries: Iterable<readonly any[]>): any;
-        hasOwn(o: object, v: PropertyKey): boolean;
-        groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-    };
-}
-
-declare namespace $ {
     class $mol_schema_boolean extends $mol_schema_any {
-        static guard<Value>(value: Value): Value & typeof this.default;
+        static guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This['default'];
         static default: boolean;
     }
 }
 
 declare namespace $ {
     class $mol_schema_float extends $mol_schema_any {
-        static guard<Value>(value: Value): Value & typeof this.default;
+        static guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This['default'];
         static default: number;
     }
 }
@@ -8444,14 +8651,14 @@ declare namespace $ {
 declare namespace $ {
     class $mol_schema_integer extends $mol_schema_float {
         $mol_schema_integer: boolean;
-        static guard<Value>(value: Value): Value & number & $mol_schema_integer;
+        static guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This['default'];
         static default: number & $mol_schema_integer;
     }
 }
 
 declare namespace $ {
     class $mol_schema_bigint extends $mol_schema_any {
-        static guard<Value>(value: Value): Value & typeof this.default;
+        static guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This['default'];
         static cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This['default'];
         static default: bigint;
     }
@@ -8459,8 +8666,8 @@ declare namespace $ {
 
 declare namespace $ {
     class $mol_schema_string extends $mol_schema_any {
-        static guard<Value>(value: Value): Value & typeof this.default;
-        static cast(value: unknown): typeof this.default;
+        static guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This['default'];
+        static cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This['default'];
         static default: string;
     }
 }
@@ -8480,13 +8687,13 @@ declare namespace $ {
         };
         Pair: Pair;
         toString(): string;
-        guard<Value>(value: Value): Value & Record<Pair[0]["default"], Pair[1]["default"]>;
-        cast(value: unknown): Record<Pair[0]["default"], Pair[1]["default"]>;
+        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
         default: Record<Pair[0]["default"], Pair[1]["default"]>;
-        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
         [Symbol.toStringTag]: string;
         [$mol_key_handle](): string;
-        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
         getPrototypeOf(o: any): any;
         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
         getOwnPropertyNames(o: any): string[];
@@ -8546,13 +8753,13 @@ declare namespace $ {
         };
         Item: Item;
         toString(): string;
-        guard<Value>(value: Value): Value & readonly Item["default"][];
-        cast(value: unknown): readonly Item["default"][];
+        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
         default: readonly Item["default"][];
-        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
         [Symbol.toStringTag]: string;
         [$mol_key_handle](): string;
-        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
         getPrototypeOf(o: any): any;
         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
         getOwnPropertyNames(o: any): string[];
@@ -8637,13 +8844,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -8699,13 +8906,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -8804,13 +9011,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -8925,13 +9132,13 @@ declare namespace $ {
             };
             Class: Uint8ArrayConstructor;
             toString(): string;
-            guard<Value>(value: Value): Value & Uint8Array<ArrayBuffer>;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: Uint8Array<ArrayBuffer>;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -8993,13 +9200,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -9055,13 +9262,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -9160,13 +9367,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -9298,13 +9505,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -9360,13 +9567,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -9465,13 +9672,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -9603,13 +9810,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -9665,13 +9872,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -9770,13 +9977,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -9908,13 +10115,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -9970,13 +10177,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -10075,13 +10282,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -10213,13 +10420,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -10275,13 +10482,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -10380,13 +10587,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -10512,13 +10719,13 @@ declare namespace $ {
             };
             Class: typeof $mol_time_moment;
             toString(): string;
-            guard<Value>(value: Value): Value & $mol_time_moment;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: $mol_time_moment;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -10580,13 +10787,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -10642,13 +10849,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -10747,13 +10954,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -10879,13 +11086,13 @@ declare namespace $ {
             };
             Class: typeof $mol_time_duration;
             toString(): string;
-            guard<Value>(value: Value): Value & $mol_time_duration;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: $mol_time_duration;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -10947,13 +11154,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -11009,13 +11216,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -11114,13 +11321,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -11246,13 +11453,13 @@ declare namespace $ {
             };
             Class: typeof $mol_time_interval;
             toString(): string;
-            guard<Value>(value: Value): Value & $mol_time_interval;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: $mol_time_interval;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -11314,13 +11521,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -11376,13 +11583,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -11481,13 +11688,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -11613,13 +11820,13 @@ declare namespace $ {
             };
             Pair: [typeof $mol_schema_string, typeof $mol_schema_any];
             toString(): string;
-            guard<Value>(value: Value): Value & Record<string, unknown>;
-            cast(value: unknown): Record<string, unknown>;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: Record<string, unknown>;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -11681,13 +11888,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -11743,13 +11950,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -11848,13 +12055,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -11980,13 +12187,13 @@ declare namespace $ {
             };
             Item: typeof $mol_schema_any;
             toString(): string;
-            guard<Value>(value: Value): Value & readonly unknown[];
-            cast(value: unknown): readonly unknown[];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: readonly unknown[];
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -12048,13 +12255,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -12110,13 +12317,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -12215,13 +12422,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -12350,13 +12557,13 @@ declare namespace $ {
                 prototype: Element;
             };
             toString(): string;
-            guard<Value>(value: Value): Value & Element;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: Element;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -12418,13 +12625,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -12480,13 +12687,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -12585,13 +12792,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -12717,13 +12924,13 @@ declare namespace $ {
             };
             Class: typeof $mol_tree2;
             toString(): string;
-            guard<Value>(value: Value): Value & $mol_tree2;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: $mol_tree2;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -12785,13 +12992,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -12847,13 +13054,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -12952,13 +13159,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -13084,13 +13291,13 @@ declare namespace $ {
             };
             Class: typeof $giper_baza_link;
             toString(): string;
-            guard<Value>(value: Value): Value & $giper_baza_link;
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: $giper_baza_link;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -13152,13 +13359,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -13214,13 +13421,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -13319,13 +13526,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value>(value: Value): Value & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -13459,13 +13666,13 @@ declare namespace $ {
                 };
                 Class: typeof $giper_baza_link;
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $giper_baza_link;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -13526,13 +13733,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -13588,13 +13795,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -13693,13 +13900,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -13885,13 +14092,13 @@ declare namespace $ {
                 };
                 Class: typeof $giper_baza_link;
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $giper_baza_link;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -13952,13 +14159,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -14014,13 +14221,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -14119,13 +14326,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -14203,13 +14410,13 @@ declare namespace $ {
             };
             Class: typeof $giper_baza_link;
             toString(): string;
-            guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             default: $giper_baza_link;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -14270,13 +14477,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -14332,13 +14539,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -14437,13 +14644,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -14609,13 +14816,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -14671,13 +14878,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -14767,13 +14974,13 @@ declare namespace $ {
                 };
                 Class: Init;
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: InstanceType<Init>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -14842,72 +15049,6 @@ declare namespace $ {
 }
 
 declare namespace $ {
-    let $mol_schema_maybe: <Some extends typeof $mol_schema_any>(this: void, Some: Some) => {
-        new (value?: any): {
-            constructor: Function;
-            toString(): string;
-            toLocaleString(): string;
-            valueOf(): Object;
-            hasOwnProperty(v: PropertyKey): boolean;
-            isPrototypeOf(v: Object): boolean;
-            propertyIsEnumerable(v: PropertyKey): boolean;
-        };
-        Some: Some;
-        toString(): string;
-        guard<Value>(value: Value): Value;
-        default: Some["default"] | null | undefined;
-        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
-        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
-        [Symbol.toStringTag]: string;
-        [$mol_key_handle](): string;
-        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
-        getPrototypeOf(o: any): any;
-        getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
-        getOwnPropertyNames(o: any): string[];
-        create(o: object | null): any;
-        create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
-        defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
-        defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
-        seal<T>(o: T): T;
-        freeze<T extends Function>(f: T): T;
-        freeze<T extends {
-            [idx: string]: U | null | undefined | object;
-        }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
-        freeze<T>(o: T): Readonly<T>;
-        preventExtensions<T>(o: T): T;
-        isSealed(o: any): boolean;
-        isFrozen(o: any): boolean;
-        isExtensible(o: any): boolean;
-        keys(o: object): string[];
-        keys(o: {}): string[];
-        assign<T extends {}, U_1>(target: T, source: U_1): T & U_1;
-        assign<T extends {}, U_2, V>(target: T, source1: U_2, source2: V): T & U_2 & V;
-        assign<T extends {}, U_3, V_1, W>(target: T, source1: U_3, source2: V_1, source3: W): T & U_3 & V_1 & W;
-        assign(target: object, ...sources: any[]): any;
-        getOwnPropertySymbols(o: any): symbol[];
-        is(value1: any, value2: any): boolean;
-        setPrototypeOf(o: any, proto: object | null): any;
-        values<T>(o: {
-            [s: string]: T;
-        } | ArrayLike<T>): T[];
-        values(o: {}): any[];
-        entries<T>(o: {
-            [s: string]: T;
-        } | ArrayLike<T>): [string, T][];
-        entries(o: {}): [string, any][];
-        getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
-            [x: string]: PropertyDescriptor;
-        };
-        fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
-            [k: string]: T;
-        };
-        fromEntries(entries: Iterable<readonly any[]>): any;
-        hasOwn(o: object, v: PropertyKey): boolean;
-        groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-    };
-}
-
-declare namespace $ {
     /** Atomic dynamic register */
     export class $giper_baza_atom extends $giper_baza_pawn {
         static tag: keyof typeof $giper_baza_unit_sand_tag;
@@ -14932,13 +15073,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -14982,7 +15123,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -14994,13 +15135,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15044,7 +15185,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -15057,13 +15198,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15107,7 +15248,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -15119,13 +15260,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15169,7 +15310,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -15220,13 +15361,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15272,7 +15413,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -15285,13 +15426,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15335,12 +15476,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -15403,8 +15544,8 @@ declare namespace $ {
     const $giper_baza_atom_blob_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: Uint8Array<ArrayBuffer> | null | undefined): Uint8Array<ArrayBuffer> | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: Uint8Array<ArrayBuffer> | null | undefined): Uint8Array<ArrayBuffer> | null | undefined;
+            val(next?: Uint8Array<ArrayBuffer> | null | undefined): Uint8Array<ArrayBuffer> | null;
+            val_of(peer: $giper_baza_link | null, next?: Uint8Array<ArrayBuffer> | null | undefined): Uint8Array<ArrayBuffer> | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -15455,13 +15596,13 @@ declare namespace $ {
                 };
                 Class: Uint8ArrayConstructor;
                 toString(): string;
-                guard<Value>(value: Value): Value & Uint8Array<ArrayBuffer>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: Uint8Array<ArrayBuffer>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -15507,13 +15648,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: Uint8Array<ArrayBuffer> | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: Uint8Array<ArrayBuffer> | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -15576,13 +15717,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15626,7 +15767,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -15638,13 +15779,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15688,7 +15829,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -15701,13 +15842,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15751,7 +15892,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -15763,13 +15904,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15813,7 +15954,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -15864,13 +16005,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15916,7 +16057,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -15929,13 +16070,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -15979,12 +16120,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -16056,8 +16197,8 @@ declare namespace $ {
     const $giper_baza_atom_bool_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: boolean | null | undefined): boolean | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: boolean | null | undefined): boolean | null | undefined;
+            val(next?: boolean | null | undefined): boolean | null;
+            val_of(peer: $giper_baza_link | null, next?: boolean | null | undefined): boolean | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -16098,13 +16239,13 @@ declare namespace $ {
             };
             Some: typeof $mol_schema_boolean;
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: boolean | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: boolean | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -16167,13 +16308,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16217,7 +16358,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -16229,13 +16370,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16279,7 +16420,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -16292,13 +16433,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16342,7 +16483,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -16354,13 +16495,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16404,7 +16545,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -16455,13 +16596,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16507,7 +16648,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -16520,13 +16661,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16570,12 +16711,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -16647,8 +16788,8 @@ declare namespace $ {
     const $giper_baza_atom_bint_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: bigint | null | undefined): bigint | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: bigint | null | undefined): bigint | null | undefined;
+            val(next?: bigint | null | undefined): bigint | null;
+            val_of(peer: $giper_baza_link | null, next?: bigint | null | undefined): bigint | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -16689,13 +16830,13 @@ declare namespace $ {
             };
             Some: typeof $mol_schema_bigint;
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: bigint | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: bigint | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -16758,13 +16899,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16808,7 +16949,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -16820,13 +16961,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16870,7 +17011,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -16883,13 +17024,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16933,7 +17074,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -16945,13 +17086,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -16995,7 +17136,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -17046,13 +17187,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17098,7 +17239,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -17111,13 +17252,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17161,12 +17302,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -17238,8 +17379,8 @@ declare namespace $ {
     const $giper_baza_atom_real_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: number | null | undefined): number | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: number | null | undefined): number | null | undefined;
+            val(next?: number | null | undefined): number | null;
+            val_of(peer: $giper_baza_link | null, next?: number | null | undefined): number | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -17280,13 +17421,13 @@ declare namespace $ {
             };
             Some: typeof $mol_schema_float;
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: number | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: number | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -17349,13 +17490,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17399,7 +17540,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -17411,13 +17552,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17461,7 +17602,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -17474,13 +17615,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17524,7 +17665,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -17536,13 +17677,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17586,7 +17727,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -17637,13 +17778,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17689,7 +17830,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -17702,13 +17843,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17752,12 +17893,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -17829,8 +17970,8 @@ declare namespace $ {
     const $giper_baza_atom_text_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: string | null | undefined): string | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: string | null | undefined): string | null | undefined;
+            val(next?: string | null | undefined): string | null;
+            val_of(peer: $giper_baza_link | null, next?: string | null | undefined): string | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -17871,13 +18012,13 @@ declare namespace $ {
             };
             Some: typeof $mol_schema_string;
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: string | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: string | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -17940,13 +18081,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -17990,7 +18131,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -18002,13 +18143,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18052,7 +18193,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -18065,13 +18206,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18115,7 +18256,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -18127,13 +18268,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18177,7 +18318,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -18228,13 +18369,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18280,7 +18421,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -18293,13 +18434,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18343,12 +18484,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -18420,8 +18561,8 @@ declare namespace $ {
     const $giper_baza_atom_time_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: $mol_time_moment | null | undefined): $mol_time_moment | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: $mol_time_moment | null | undefined): $mol_time_moment | null | undefined;
+            val(next?: $mol_time_moment | null | undefined): $mol_time_moment | null;
+            val_of(peer: $giper_baza_link | null, next?: $mol_time_moment | null | undefined): $mol_time_moment | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -18472,13 +18613,13 @@ declare namespace $ {
                 };
                 Class: typeof $mol_time_moment;
                 toString(): string;
-                guard<Value>(value: Value): Value & $mol_time_moment;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $mol_time_moment;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -18524,13 +18665,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: $mol_time_moment | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: $mol_time_moment | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -18593,13 +18734,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18643,7 +18784,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -18655,13 +18796,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18705,7 +18846,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -18718,13 +18859,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18768,7 +18909,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -18780,13 +18921,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18830,7 +18971,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -18881,13 +19022,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18933,7 +19074,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -18946,13 +19087,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -18996,12 +19137,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -19073,8 +19214,8 @@ declare namespace $ {
     const $giper_baza_atom_dura_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: $mol_time_duration | null | undefined): $mol_time_duration | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: $mol_time_duration | null | undefined): $mol_time_duration | null | undefined;
+            val(next?: $mol_time_duration | null | undefined): $mol_time_duration | null;
+            val_of(peer: $giper_baza_link | null, next?: $mol_time_duration | null | undefined): $mol_time_duration | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -19125,13 +19266,13 @@ declare namespace $ {
                 };
                 Class: typeof $mol_time_duration;
                 toString(): string;
-                guard<Value>(value: Value): Value & $mol_time_duration;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $mol_time_duration;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -19177,13 +19318,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: $mol_time_duration | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: $mol_time_duration | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -19246,13 +19387,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -19296,7 +19437,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -19308,13 +19449,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -19358,7 +19499,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -19371,13 +19512,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -19421,7 +19562,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -19433,13 +19574,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -19483,7 +19624,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -19534,13 +19675,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -19586,7 +19727,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -19599,13 +19740,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -19649,12 +19790,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -19726,8 +19867,8 @@ declare namespace $ {
     const $giper_baza_atom_span_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: $mol_time_interval | null | undefined): $mol_time_interval | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: $mol_time_interval | null | undefined): $mol_time_interval | null | undefined;
+            val(next?: $mol_time_interval | null | undefined): $mol_time_interval | null;
+            val_of(peer: $giper_baza_link | null, next?: $mol_time_interval | null | undefined): $mol_time_interval | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -19778,13 +19919,13 @@ declare namespace $ {
                 };
                 Class: typeof $mol_time_interval;
                 toString(): string;
-                guard<Value>(value: Value): Value & $mol_time_interval;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $mol_time_interval;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -19830,13 +19971,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: $mol_time_interval | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: $mol_time_interval | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -19899,13 +20040,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -19949,7 +20090,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -19961,13 +20102,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20011,7 +20152,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -20024,13 +20165,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20074,7 +20215,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -20086,13 +20227,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20136,7 +20277,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -20187,13 +20328,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20239,7 +20380,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -20252,13 +20393,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20302,12 +20443,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -20379,8 +20520,8 @@ declare namespace $ {
     const $giper_baza_atom_dict_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: Record<string, unknown> | null | undefined): Record<string, unknown> | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: Record<string, unknown> | null | undefined): Record<string, unknown> | null | undefined;
+            val(next?: Record<string, unknown> | null | undefined): Record<string, unknown> | null;
+            val_of(peer: $giper_baza_link | null, next?: Record<string, unknown> | null | undefined): Record<string, unknown> | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -20431,13 +20572,13 @@ declare namespace $ {
                 };
                 Pair: [typeof $mol_schema_string, typeof $mol_schema_any];
                 toString(): string;
-                guard<Value>(value: Value): Value & Record<string, unknown>;
-                cast(value: unknown): Record<string, unknown>;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: Record<string, unknown>;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -20483,13 +20624,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: Record<string, unknown> | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: Record<string, unknown> | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -20552,13 +20693,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20602,7 +20743,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -20614,13 +20755,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20664,7 +20805,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -20677,13 +20818,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20727,7 +20868,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -20739,13 +20880,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20789,7 +20930,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -20840,13 +20981,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20892,7 +21033,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -20905,13 +21046,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -20955,12 +21096,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -21032,8 +21173,8 @@ declare namespace $ {
     const $giper_baza_atom_list_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: readonly unknown[] | null | undefined): readonly unknown[] | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: readonly unknown[] | null | undefined): readonly unknown[] | null | undefined;
+            val(next?: readonly unknown[] | null | undefined): readonly unknown[] | null;
+            val_of(peer: $giper_baza_link | null, next?: readonly unknown[] | null | undefined): readonly unknown[] | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -21084,13 +21225,13 @@ declare namespace $ {
                 };
                 Item: typeof $mol_schema_any;
                 toString(): string;
-                guard<Value>(value: Value): Value & readonly unknown[];
-                cast(value: unknown): readonly unknown[];
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: readonly unknown[];
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -21136,13 +21277,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: readonly unknown[] | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: readonly unknown[] | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -21205,13 +21346,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -21255,7 +21396,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -21267,13 +21408,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -21317,7 +21458,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -21330,13 +21471,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -21380,7 +21521,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -21392,13 +21533,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -21442,7 +21583,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -21493,13 +21634,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -21545,7 +21686,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -21558,13 +21699,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -21608,12 +21749,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -21685,8 +21826,8 @@ declare namespace $ {
     const $giper_baza_atom_elem_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: Element | null | undefined): Element | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: Element | null | undefined): Element | null | undefined;
+            val(next?: Element | null | undefined): Element | null;
+            val_of(peer: $giper_baza_link | null, next?: Element | null | undefined): Element | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -21740,13 +21881,13 @@ declare namespace $ {
                     prototype: Element;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value & Element;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: Element;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -21792,13 +21933,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: Element | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: Element | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -21861,13 +22002,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -21911,7 +22052,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -21923,13 +22064,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -21973,7 +22114,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -21986,13 +22127,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22036,7 +22177,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -22048,13 +22189,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22098,7 +22239,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -22149,13 +22290,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22201,7 +22342,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -22214,13 +22355,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22264,12 +22405,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -22341,8 +22482,8 @@ declare namespace $ {
     const $giper_baza_atom_tree_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: $mol_tree2 | null | undefined): $mol_tree2 | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: $mol_tree2 | null | undefined): $mol_tree2 | null | undefined;
+            val(next?: $mol_tree2 | null | undefined): $mol_tree2 | null;
+            val_of(peer: $giper_baza_link | null, next?: $mol_tree2 | null | undefined): $mol_tree2 | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -22393,13 +22534,13 @@ declare namespace $ {
                 };
                 Class: typeof $mol_tree2;
                 toString(): string;
-                guard<Value>(value: Value): Value & $mol_tree2;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $mol_tree2;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -22445,13 +22586,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: $mol_tree2 | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: $mol_tree2 | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -22514,13 +22655,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22564,7 +22705,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -22576,13 +22717,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22626,7 +22767,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -22639,13 +22780,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22689,7 +22830,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -22701,13 +22842,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22751,7 +22892,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -22802,13 +22943,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22854,7 +22995,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -22867,13 +23008,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -22917,12 +23058,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -22994,8 +23135,8 @@ declare namespace $ {
     const $giper_baza_atom_link_base: {
         new (): {
             /** Get/Set value of Pawn field */
-            val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+            val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+            val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -23046,13 +23187,13 @@ declare namespace $ {
                 };
                 Class: typeof $giper_baza_link;
                 toString(): string;
-                guard<Value>(value: Value): Value & $giper_baza_link;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $giper_baza_link;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -23098,13 +23239,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: $giper_baza_link | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: $giper_baza_link | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -23167,13 +23308,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -23217,7 +23358,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -23229,13 +23370,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -23279,7 +23420,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -23292,13 +23433,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -23342,7 +23483,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -23354,13 +23495,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -23404,7 +23545,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -23455,13 +23596,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -23507,7 +23648,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -23520,13 +23661,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -23570,12 +23711,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -23661,8 +23802,8 @@ declare namespace $ {
                 /** @deprecated Use ensure( null ) */
                 local_ensure(): $mol_type_result<$mol_type_result<Value>> | null;
                 /** Get/Set value of Pawn field */
-                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -23715,13 +23856,13 @@ declare namespace $ {
                     };
                     Class: typeof $giper_baza_link;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: $giper_baza_link;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -23767,13 +23908,13 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1;
-                default: $giper_baza_link | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
+                default: $giper_baza_link | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -23835,13 +23976,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -23885,7 +24026,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                    })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
                             toString(): string;
@@ -23897,13 +24038,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -23947,7 +24088,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined) | null;
+                    })["default"] | null) | null;
                     val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
@@ -23960,13 +24101,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24010,7 +24151,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                    })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
                             toString(): string;
@@ -24022,13 +24163,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24072,7 +24213,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined) | null;
+                    })["default"] | null) | null;
                     pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                     vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                     vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -24123,13 +24264,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24175,7 +24316,7 @@ declare namespace $ {
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                     };
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1;
+                    guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
                     default: (Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
@@ -24188,13 +24329,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24238,12 +24379,12 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    })["default"] | null;
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -24328,8 +24469,8 @@ declare namespace $ {
             /** @deprecated Use ensure( null ) */
             local_ensure(): $mol_type_result<$mol_type_result<Value>> | null;
             /** Get/Set value of Pawn field */
-            val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+            val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+            val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -24377,8 +24518,8 @@ declare namespace $ {
                 /** @deprecated Use ensure( null ) */
                 local_ensure(): $mol_type_result<$mol_type_result<Value>> | null;
                 /** Get/Set value of Pawn field */
-                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -24431,13 +24572,13 @@ declare namespace $ {
                     };
                     Class: typeof $giper_baza_link;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: $giper_baza_link;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -24483,13 +24624,13 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1;
-                default: $giper_baza_link | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
+                default: $giper_baza_link | null;
+                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -24551,13 +24692,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24601,7 +24742,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                    })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
                             toString(): string;
@@ -24613,13 +24754,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24663,7 +24804,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined) | null;
+                    })["default"] | null) | null;
                     val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
@@ -24676,13 +24817,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24726,7 +24867,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                    })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
                             toString(): string;
@@ -24738,13 +24879,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24788,7 +24929,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined) | null;
+                    })["default"] | null) | null;
                     pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                     vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                     vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -24839,13 +24980,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24891,7 +25032,7 @@ declare namespace $ {
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                     };
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1;
+                    guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
                     default: (Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
@@ -24904,13 +25045,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -24954,12 +25095,12 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    })["default"] | null;
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25047,13 +25188,13 @@ declare namespace $ {
                 };
                 Class: typeof $giper_baza_link;
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $giper_baza_link;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -25099,13 +25240,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value_1>(value: Value_1): Value_1;
-            default: $giper_baza_link | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
+            default: $giper_baza_link | null;
+            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -25167,13 +25308,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25217,7 +25358,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -25229,13 +25370,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25279,7 +25420,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -25292,13 +25433,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25342,7 +25483,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -25354,13 +25495,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25404,7 +25545,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -25455,13 +25596,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25507,7 +25648,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1;
+                guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -25520,13 +25661,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25570,12 +25711,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -25647,8 +25788,8 @@ declare namespace $ {
 declare namespace $ {
     const $giper_baza_stat_series_base: {
         new (): {
-            val(next?: readonly number[] | null | undefined): readonly number[] | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: readonly number[] | null | undefined): readonly number[] | null | undefined;
+            val(next?: readonly number[] | null | undefined): readonly number[] | null;
+            val_of(peer: $giper_baza_link | null, next?: readonly number[] | null | undefined): readonly number[] | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -25699,13 +25840,13 @@ declare namespace $ {
                 };
                 Item: typeof $mol_schema_float;
                 toString(): string;
-                guard<Value>(value: Value): Value & readonly number[];
-                cast(value: unknown): readonly number[];
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: readonly number[];
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -25751,13 +25892,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: readonly number[] | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: readonly number[] | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -25818,13 +25959,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25868,7 +26009,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -25880,13 +26021,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25930,7 +26071,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -25943,13 +26084,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -25993,7 +26134,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -26005,13 +26146,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -26055,7 +26196,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -26106,13 +26247,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -26158,7 +26299,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -26171,13 +26312,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -26221,12 +26362,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -26341,6 +26482,37 @@ declare namespace $ {
     const $giper_baza_app_stat_base: Omit<typeof $giper_baza_dict, "prototype"> & {
         new (...args: any[]): $mol_type_override<$giper_baza_dict, {
             readonly Uptime: (auto?: any) => $giper_baza_atom_dura | null;
+            readonly Slaves: (auto?: any) => {
+                val(next?: readonly string[] | null | undefined): readonly string[] | null;
+                val_of(peer: $giper_baza_link | null, next?: readonly string[] | null | undefined): readonly string[] | null;
+                pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
+                vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
+                vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
+                selection(lord: $giper_baza_link, next?: readonly [begin: number, end: number]): number[] | readonly [begin: number, end: number];
+                [$mol_dev_format_head](): any[];
+                land(): $giper_baza_land;
+                head(): $giper_baza_link;
+                land_link(): $giper_baza_link;
+                link(): $giper_baza_link;
+                toJSON(): string;
+                cast<Pawn_1 extends typeof $giper_baza_pawn>(Pawn: Pawn_1): InstanceType<Pawn_1>;
+                pawns<Pawn_1 extends typeof $giper_baza_pawn>(Pawn: Pawn_1 | null): readonly InstanceType<Pawn_1>[];
+                units(): $giper_baza_unit_sand[];
+                units_of(peer: $giper_baza_link | null): $giper_baza_unit_sand[];
+                meta(next?: $giper_baza_link): $giper_baza_link | null;
+                meta_of(peer: $giper_baza_link | null): $giper_baza_link | null;
+                filled(): boolean;
+                can_change(): boolean;
+                last_change(): $mol_time_moment | null;
+                authors(): $giper_baza_auth_pass[];
+                get $(): $;
+                set $(next: $);
+                destructor(): void;
+                toString(): string;
+                [Symbol.toStringTag]: string;
+                [$mol_ambient_ref]: $;
+                [Symbol.dispose](): void;
+            } | null;
             readonly Cpu_user: (auto?: any) => $giper_baza_stat_ranges | null;
             readonly Cpu_system: (auto?: any) => $giper_baza_stat_ranges | null;
             readonly Mem_used: (auto?: any) => $giper_baza_stat_ranges | null;
@@ -26359,6 +26531,653 @@ declare namespace $ {
             [x: string]: typeof $giper_baza_pawn;
         } & {
             readonly Uptime: typeof $giper_baza_atom_dura;
+            readonly Slaves: {
+                new (): {
+                    val(next?: readonly string[] | null | undefined): readonly string[] | null;
+                    val_of(peer: $giper_baza_link | null, next?: readonly string[] | null | undefined): readonly string[] | null;
+                    pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
+                    vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
+                    vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
+                    selection(lord: $giper_baza_link, next?: readonly [begin: number, end: number]): number[] | readonly [begin: number, end: number];
+                    [$mol_dev_format_head](): any[];
+                    land(): $giper_baza_land;
+                    head(): $giper_baza_link;
+                    land_link(): $giper_baza_link;
+                    link(): $giper_baza_link;
+                    toJSON(): string;
+                    cast<Pawn_1 extends typeof $giper_baza_pawn>(Pawn: Pawn_1): InstanceType<Pawn_1>;
+                    pawns<Pawn_1 extends typeof $giper_baza_pawn>(Pawn: Pawn_1 | null): readonly InstanceType<Pawn_1>[];
+                    units(): $giper_baza_unit_sand[];
+                    units_of(peer: $giper_baza_link | null): $giper_baza_unit_sand[];
+                    meta(next?: $giper_baza_link): $giper_baza_link | null;
+                    meta_of(peer: $giper_baza_link | null): $giper_baza_link | null;
+                    filled(): boolean;
+                    can_change(): boolean;
+                    last_change(): $mol_time_moment | null;
+                    authors(): $giper_baza_auth_pass[];
+                    get $(): $;
+                    set $(next: $);
+                    destructor(): void;
+                    toString(): string;
+                    [Symbol.toStringTag]: string;
+                    [$mol_ambient_ref]: $;
+                    [Symbol.dispose](): void;
+                };
+                Schema: {
+                    new (value?: any): {
+                        constructor: Function;
+                        toString(): string;
+                        toLocaleString(): string;
+                        valueOf(): Object;
+                        hasOwnProperty(v: PropertyKey): boolean;
+                        isPrototypeOf(v: Object): boolean;
+                        propertyIsEnumerable(v: PropertyKey): boolean;
+                    };
+                    Some: {
+                        new (value?: any): {
+                            constructor: Function;
+                            toString(): string;
+                            toLocaleString(): string;
+                            valueOf(): Object;
+                            hasOwnProperty(v: PropertyKey): boolean;
+                            isPrototypeOf(v: Object): boolean;
+                            propertyIsEnumerable(v: PropertyKey): boolean;
+                        };
+                        Item: typeof $mol_schema_string;
+                        toString(): string;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                        default: readonly string[];
+                        check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
+                        [Symbol.toStringTag]: string;
+                        [$mol_key_handle](): string;
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
+                        getPrototypeOf(o: any): any;
+                        getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                        getOwnPropertyNames(o: any): string[];
+                        create(o: object | null): any;
+                        create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                        defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
+                        defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
+                        seal<T>(o: T): T;
+                        freeze<T extends Function>(f: T): T;
+                        freeze<T extends {
+                            [idx: string]: U | null | undefined | object;
+                        }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
+                        freeze<T>(o: T): Readonly<T>;
+                        preventExtensions<T>(o: T): T;
+                        isSealed(o: any): boolean;
+                        isFrozen(o: any): boolean;
+                        isExtensible(o: any): boolean;
+                        keys(o: object): string[];
+                        keys(o: {}): string[];
+                        assign<T extends {}, U>(target: T, source: U): T & U;
+                        assign<T extends {}, U, V>(target: T, source1: U, source2: V): T & U & V;
+                        assign<T extends {}, U, V, W>(target: T, source1: U, source2: V, source3: W): T & U & V & W;
+                        assign(target: object, ...sources: any[]): any;
+                        getOwnPropertySymbols(o: any): symbol[];
+                        is(value1: any, value2: any): boolean;
+                        setPrototypeOf(o: any, proto: object | null): any;
+                        values<T>(o: {
+                            [s: string]: T;
+                        } | ArrayLike<T>): T[];
+                        values(o: {}): any[];
+                        entries<T>(o: {
+                            [s: string]: T;
+                        } | ArrayLike<T>): [string, T][];
+                        entries(o: {}): [string, any][];
+                        getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
+                            [x: string]: PropertyDescriptor;
+                        };
+                        fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
+                            [k: string]: T;
+                        };
+                        fromEntries(entries: Iterable<readonly any[]>): any;
+                        hasOwn(o: object, v: PropertyKey): boolean;
+                        groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                    };
+                    toString(): string;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                    default: readonly string[] | null;
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
+                    cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                    [Symbol.toStringTag]: string;
+                    [$mol_key_handle](): string;
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
+                    getPrototypeOf(o: any): any;
+                    getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                    getOwnPropertyNames(o: any): string[];
+                    create(o: object | null): any;
+                    create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                    defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
+                    defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
+                    seal<T>(o: T): T;
+                    freeze<T extends Function>(f: T): T;
+                    freeze<T extends {
+                        [idx: string]: U | null | undefined | object;
+                    }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
+                    freeze<T>(o: T): Readonly<T>;
+                    preventExtensions<T>(o: T): T;
+                    isSealed(o: any): boolean;
+                    isFrozen(o: any): boolean;
+                    isExtensible(o: any): boolean;
+                    keys(o: object): string[];
+                    keys(o: {}): string[];
+                    assign<T extends {}, U>(target: T, source: U): T & U;
+                    assign<T extends {}, U, V>(target: T, source1: U, source2: V): T & U & V;
+                    assign<T extends {}, U, V, W>(target: T, source1: U, source2: V, source3: W): T & U & V & W;
+                    assign(target: object, ...sources: any[]): any;
+                    getOwnPropertySymbols(o: any): symbol[];
+                    is(value1: any, value2: any): boolean;
+                    setPrototypeOf(o: any, proto: object | null): any;
+                    values<T>(o: {
+                        [s: string]: T;
+                    } | ArrayLike<T>): T[];
+                    values(o: {}): any[];
+                    entries<T>(o: {
+                        [s: string]: T;
+                    } | ArrayLike<T>): [string, T][];
+                    entries(o: {}): [string, any][];
+                    getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
+                        [x: string]: PropertyDescriptor;
+                    };
+                    fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
+                        [k: string]: T;
+                    };
+                    fromEntries(entries: Iterable<readonly any[]>): any;
+                    hasOwn(o: object, v: PropertyKey): boolean;
+                    groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                };
+                toString(): any;
+                tag: keyof typeof $giper_baza_unit_sand_tag;
+                of<Init extends new (...args: any[]) => any>(init: Init): {
+                    new (): {
+                        val(next?: (Init extends typeof $mol_schema_any ? Init : {
+                            new (value?: any): {
+                                constructor: Function;
+                                toString(): string;
+                                toLocaleString(): string;
+                                valueOf(): Object;
+                                hasOwnProperty(v: PropertyKey): boolean;
+                                isPrototypeOf(v: Object): boolean;
+                                propertyIsEnumerable(v: PropertyKey): boolean;
+                            };
+                            Class: Init;
+                            toString(): string;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                            default: InstanceType<Init>;
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+                            [Symbol.toStringTag]: string;
+                            [$mol_key_handle](): string;
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+                            getPrototypeOf(o: any): any;
+                            getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                            getOwnPropertyNames(o: any): string[];
+                            create(o: object | null): any;
+                            create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                            defineProperty<T>(o: T, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T;
+                            defineProperties<T>(o: T, properties: PropertyDescriptorMap & ThisType<any>): T;
+                            seal<T>(o: T): T;
+                            freeze<T extends Function>(f: T): T;
+                            freeze<T extends {
+                                [idx: string]: U | null | undefined | object;
+                            }, U extends string | bigint | number | boolean | symbol>(o: T): Readonly<T>;
+                            freeze<T>(o: T): Readonly<T>;
+                            preventExtensions<T>(o: T): T;
+                            isSealed(o: any): boolean;
+                            isFrozen(o: any): boolean;
+                            isExtensible(o: any): boolean;
+                            keys(o: object): string[];
+                            keys(o: {}): string[];
+                            assign<T extends {}, U_1>(target: T, source: U_1): T & U_1;
+                            assign<T extends {}, U_2, V>(target: T, source1: U_2, source2: V): T & U_2 & V;
+                            assign<T extends {}, U_3, V_1, W>(target: T, source1: U_3, source2: V_1, source3: W): T & U_3 & V_1 & W;
+                            assign(target: object, ...sources: any[]): any;
+                            getOwnPropertySymbols(o: any): symbol[];
+                            is(value1: any, value2: any): boolean;
+                            setPrototypeOf(o: any, proto: object | null): any;
+                            values<T>(o: {
+                                [s: string]: T;
+                            } | ArrayLike<T>): T[];
+                            values(o: {}): any[];
+                            entries<T>(o: {
+                                [s: string]: T;
+                            } | ArrayLike<T>): [string, T][];
+                            entries(o: {}): [string, any][];
+                            getOwnPropertyDescriptors<T>(o: T): { [P in keyof T]: TypedPropertyDescriptor<T[P]>; } & {
+                                [x: string]: PropertyDescriptor;
+                            };
+                            fromEntries<T = any>(entries: Iterable<readonly [PropertyKey, T]>): {
+                                [k: string]: T;
+                            };
+                            fromEntries(entries: Iterable<readonly any[]>): any;
+                            hasOwn(o: object, v: PropertyKey): boolean;
+                            groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
+                            new (value?: any): {
+                                constructor: Function;
+                                toString(): string;
+                                toLocaleString(): string;
+                                valueOf(): Object;
+                                hasOwnProperty(v: PropertyKey): boolean;
+                                isPrototypeOf(v: Object): boolean;
+                                propertyIsEnumerable(v: PropertyKey): boolean;
+                            };
+                            Class: Init;
+                            toString(): string;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                            default: InstanceType<Init>;
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+                            [Symbol.toStringTag]: string;
+                            [$mol_key_handle](): string;
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+                            getPrototypeOf(o: any): any;
+                            getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                            getOwnPropertyNames(o: any): string[];
+                            create(o: object | null): any;
+                            create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                            defineProperty<T_1>(o: T_1, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T_1;
+                            defineProperties<T_1>(o: T_1, properties: PropertyDescriptorMap & ThisType<any>): T_1;
+                            seal<T_1>(o: T_1): T_1;
+                            freeze<T_1 extends Function>(f: T_1): T_1;
+                            freeze<T_1 extends {
+                                [idx: string]: U | null | undefined | object;
+                            }, U extends string | bigint | number | boolean | symbol>(o: T_1): Readonly<T_1>;
+                            freeze<T_1>(o: T_1): Readonly<T_1>;
+                            preventExtensions<T_1>(o: T_1): T_1;
+                            isSealed(o: any): boolean;
+                            isFrozen(o: any): boolean;
+                            isExtensible(o: any): boolean;
+                            keys(o: object): string[];
+                            keys(o: {}): string[];
+                            assign<T_1 extends {}, U_1>(target: T_1, source: U_1): T_1 & U_1;
+                            assign<T_1 extends {}, U_2, V>(target: T_1, source1: U_2, source2: V): T_1 & U_2 & V;
+                            assign<T_1 extends {}, U_3, V_1, W>(target: T_1, source1: U_3, source2: V_1, source3: W): T_1 & U_3 & V_1 & W;
+                            assign(target: object, ...sources: any[]): any;
+                            getOwnPropertySymbols(o: any): symbol[];
+                            is(value1: any, value2: any): boolean;
+                            setPrototypeOf(o: any, proto: object | null): any;
+                            values<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): T_1[];
+                            values(o: {}): any[];
+                            entries<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): [string, T_1][];
+                            entries(o: {}): [string, any][];
+                            getOwnPropertyDescriptors<T_1>(o: T_1): { [P in keyof T_1]: TypedPropertyDescriptor<T_1[P]>; } & {
+                                [x: string]: PropertyDescriptor;
+                            };
+                            fromEntries<T_1 = any>(entries: Iterable<readonly [PropertyKey, T_1]>): {
+                                [k: string]: T_1;
+                            };
+                            fromEntries(entries: Iterable<readonly any[]>): any;
+                            hasOwn(o: object, v: PropertyKey): boolean;
+                            groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                        })["default"] | null) | null;
+                        val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
+                            new (value?: any): {
+                                constructor: Function;
+                                toString(): string;
+                                toLocaleString(): string;
+                                valueOf(): Object;
+                                hasOwnProperty(v: PropertyKey): boolean;
+                                isPrototypeOf(v: Object): boolean;
+                                propertyIsEnumerable(v: PropertyKey): boolean;
+                            };
+                            Class: Init;
+                            toString(): string;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                            default: InstanceType<Init>;
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+                            [Symbol.toStringTag]: string;
+                            [$mol_key_handle](): string;
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+                            getPrototypeOf(o: any): any;
+                            getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                            getOwnPropertyNames(o: any): string[];
+                            create(o: object | null): any;
+                            create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                            defineProperty<T_1>(o: T_1, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T_1;
+                            defineProperties<T_1>(o: T_1, properties: PropertyDescriptorMap & ThisType<any>): T_1;
+                            seal<T_1>(o: T_1): T_1;
+                            freeze<T_1 extends Function>(f: T_1): T_1;
+                            freeze<T_1 extends {
+                                [idx: string]: U | null | undefined | object;
+                            }, U extends string | bigint | number | boolean | symbol>(o: T_1): Readonly<T_1>;
+                            freeze<T_1>(o: T_1): Readonly<T_1>;
+                            preventExtensions<T_1>(o: T_1): T_1;
+                            isSealed(o: any): boolean;
+                            isFrozen(o: any): boolean;
+                            isExtensible(o: any): boolean;
+                            keys(o: object): string[];
+                            keys(o: {}): string[];
+                            assign<T_1 extends {}, U_1>(target: T_1, source: U_1): T_1 & U_1;
+                            assign<T_1 extends {}, U_2, V>(target: T_1, source1: U_2, source2: V): T_1 & U_2 & V;
+                            assign<T_1 extends {}, U_3, V_1, W>(target: T_1, source1: U_3, source2: V_1, source3: W): T_1 & U_3 & V_1 & W;
+                            assign(target: object, ...sources: any[]): any;
+                            getOwnPropertySymbols(o: any): symbol[];
+                            is(value1: any, value2: any): boolean;
+                            setPrototypeOf(o: any, proto: object | null): any;
+                            values<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): T_1[];
+                            values(o: {}): any[];
+                            entries<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): [string, T_1][];
+                            entries(o: {}): [string, any][];
+                            getOwnPropertyDescriptors<T_1>(o: T_1): { [P in keyof T_1]: TypedPropertyDescriptor<T_1[P]>; } & {
+                                [x: string]: PropertyDescriptor;
+                            };
+                            fromEntries<T_1 = any>(entries: Iterable<readonly [PropertyKey, T_1]>): {
+                                [k: string]: T_1;
+                            };
+                            fromEntries(entries: Iterable<readonly any[]>): any;
+                            hasOwn(o: object, v: PropertyKey): boolean;
+                            groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
+                            new (value?: any): {
+                                constructor: Function;
+                                toString(): string;
+                                toLocaleString(): string;
+                                valueOf(): Object;
+                                hasOwnProperty(v: PropertyKey): boolean;
+                                isPrototypeOf(v: Object): boolean;
+                                propertyIsEnumerable(v: PropertyKey): boolean;
+                            };
+                            Class: Init;
+                            toString(): string;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                            default: InstanceType<Init>;
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+                            [Symbol.toStringTag]: string;
+                            [$mol_key_handle](): string;
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+                            getPrototypeOf(o: any): any;
+                            getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                            getOwnPropertyNames(o: any): string[];
+                            create(o: object | null): any;
+                            create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                            defineProperty<T_1>(o: T_1, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T_1;
+                            defineProperties<T_1>(o: T_1, properties: PropertyDescriptorMap & ThisType<any>): T_1;
+                            seal<T_1>(o: T_1): T_1;
+                            freeze<T_1 extends Function>(f: T_1): T_1;
+                            freeze<T_1 extends {
+                                [idx: string]: U | null | undefined | object;
+                            }, U extends string | bigint | number | boolean | symbol>(o: T_1): Readonly<T_1>;
+                            freeze<T_1>(o: T_1): Readonly<T_1>;
+                            preventExtensions<T_1>(o: T_1): T_1;
+                            isSealed(o: any): boolean;
+                            isFrozen(o: any): boolean;
+                            isExtensible(o: any): boolean;
+                            keys(o: object): string[];
+                            keys(o: {}): string[];
+                            assign<T_1 extends {}, U_1>(target: T_1, source: U_1): T_1 & U_1;
+                            assign<T_1 extends {}, U_2, V>(target: T_1, source1: U_2, source2: V): T_1 & U_2 & V;
+                            assign<T_1 extends {}, U_3, V_1, W>(target: T_1, source1: U_3, source2: V_1, source3: W): T_1 & U_3 & V_1 & W;
+                            assign(target: object, ...sources: any[]): any;
+                            getOwnPropertySymbols(o: any): symbol[];
+                            is(value1: any, value2: any): boolean;
+                            setPrototypeOf(o: any, proto: object | null): any;
+                            values<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): T_1[];
+                            values(o: {}): any[];
+                            entries<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): [string, T_1][];
+                            entries(o: {}): [string, any][];
+                            getOwnPropertyDescriptors<T_1>(o: T_1): { [P in keyof T_1]: TypedPropertyDescriptor<T_1[P]>; } & {
+                                [x: string]: PropertyDescriptor;
+                            };
+                            fromEntries<T_1 = any>(entries: Iterable<readonly [PropertyKey, T_1]>): {
+                                [k: string]: T_1;
+                            };
+                            fromEntries(entries: Iterable<readonly any[]>): any;
+                            hasOwn(o: object, v: PropertyKey): boolean;
+                            groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                        })["default"] | null) | null;
+                        pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
+                        vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
+                        vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
+                        selection(lord: $giper_baza_link, next?: readonly [begin: number, end: number]): number[] | readonly [begin: number, end: number];
+                        [$mol_dev_format_head](): any[];
+                        land(): $giper_baza_land;
+                        head(): $giper_baza_link;
+                        land_link(): $giper_baza_link;
+                        link(): $giper_baza_link;
+                        toJSON(): string;
+                        cast<Pawn_1 extends typeof $giper_baza_pawn>(Pawn: Pawn_1): InstanceType<Pawn_1>;
+                        pawns<Pawn_1 extends typeof $giper_baza_pawn>(Pawn: Pawn_1 | null): readonly InstanceType<Pawn_1>[];
+                        units(): $giper_baza_unit_sand[];
+                        units_of(peer: $giper_baza_link | null): $giper_baza_unit_sand[];
+                        meta(next?: $giper_baza_link): $giper_baza_link | null;
+                        meta_of(peer: $giper_baza_link | null): $giper_baza_link | null;
+                        filled(): boolean;
+                        can_change(): boolean;
+                        last_change(): $mol_time_moment | null;
+                        authors(): $giper_baza_auth_pass[];
+                        get $(): $;
+                        set $(next: $);
+                        destructor(): void;
+                        toString(): string;
+                        [Symbol.toStringTag]: string;
+                        [$mol_ambient_ref]: $;
+                        [Symbol.dispose](): void;
+                    };
+                    Schema: {
+                        new (value?: any): {
+                            constructor: Function;
+                            toString(): string;
+                            toLocaleString(): string;
+                            valueOf(): Object;
+                            hasOwnProperty(v: PropertyKey): boolean;
+                            isPrototypeOf(v: Object): boolean;
+                            propertyIsEnumerable(v: PropertyKey): boolean;
+                        };
+                        Some: Init extends typeof $mol_schema_any ? Init : {
+                            new (value?: any): {
+                                constructor: Function;
+                                toString(): string;
+                                toLocaleString(): string;
+                                valueOf(): Object;
+                                hasOwnProperty(v: PropertyKey): boolean;
+                                isPrototypeOf(v: Object): boolean;
+                                propertyIsEnumerable(v: PropertyKey): boolean;
+                            };
+                            Class: Init;
+                            toString(): string;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                            default: InstanceType<Init>;
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+                            [Symbol.toStringTag]: string;
+                            [$mol_key_handle](): string;
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+                            getPrototypeOf(o: any): any;
+                            getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                            getOwnPropertyNames(o: any): string[];
+                            create(o: object | null): any;
+                            create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                            defineProperty<T_1>(o: T_1, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T_1;
+                            defineProperties<T_1>(o: T_1, properties: PropertyDescriptorMap & ThisType<any>): T_1;
+                            seal<T_1>(o: T_1): T_1;
+                            freeze<T_1 extends Function>(f: T_1): T_1;
+                            freeze<T_1 extends {
+                                [idx: string]: U | null | undefined | object;
+                            }, U extends string | bigint | number | boolean | symbol>(o: T_1): Readonly<T_1>;
+                            freeze<T_1>(o: T_1): Readonly<T_1>;
+                            preventExtensions<T_1>(o: T_1): T_1;
+                            isSealed(o: any): boolean;
+                            isFrozen(o: any): boolean;
+                            isExtensible(o: any): boolean;
+                            keys(o: object): string[];
+                            keys(o: {}): string[];
+                            assign<T_1 extends {}, U_1>(target: T_1, source: U_1): T_1 & U_1;
+                            assign<T_1 extends {}, U_2, V>(target: T_1, source1: U_2, source2: V): T_1 & U_2 & V;
+                            assign<T_1 extends {}, U_3, V_1, W>(target: T_1, source1: U_3, source2: V_1, source3: W): T_1 & U_3 & V_1 & W;
+                            assign(target: object, ...sources: any[]): any;
+                            getOwnPropertySymbols(o: any): symbol[];
+                            is(value1: any, value2: any): boolean;
+                            setPrototypeOf(o: any, proto: object | null): any;
+                            values<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): T_1[];
+                            values(o: {}): any[];
+                            entries<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): [string, T_1][];
+                            entries(o: {}): [string, any][];
+                            getOwnPropertyDescriptors<T_1>(o: T_1): { [P in keyof T_1]: TypedPropertyDescriptor<T_1[P]>; } & {
+                                [x: string]: PropertyDescriptor;
+                            };
+                            fromEntries<T_1 = any>(entries: Iterable<readonly [PropertyKey, T_1]>): {
+                                [k: string]: T_1;
+                            };
+                            fromEntries(entries: Iterable<readonly any[]>): any;
+                            hasOwn(o: object, v: PropertyKey): boolean;
+                            groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                        };
+                        toString(): string;
+                        guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
+                        default: (Init extends typeof $mol_schema_any ? Init : {
+                            new (value?: any): {
+                                constructor: Function;
+                                toString(): string;
+                                toLocaleString(): string;
+                                valueOf(): Object;
+                                hasOwnProperty(v: PropertyKey): boolean;
+                                isPrototypeOf(v: Object): boolean;
+                                propertyIsEnumerable(v: PropertyKey): boolean;
+                            };
+                            Class: Init;
+                            toString(): string;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                            cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                            default: InstanceType<Init>;
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+                            [Symbol.toStringTag]: string;
+                            [$mol_key_handle](): string;
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+                            getPrototypeOf(o: any): any;
+                            getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                            getOwnPropertyNames(o: any): string[];
+                            create(o: object | null): any;
+                            create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                            defineProperty<T_1>(o: T_1, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T_1;
+                            defineProperties<T_1>(o: T_1, properties: PropertyDescriptorMap & ThisType<any>): T_1;
+                            seal<T_1>(o: T_1): T_1;
+                            freeze<T_1 extends Function>(f: T_1): T_1;
+                            freeze<T_1 extends {
+                                [idx: string]: U | null | undefined | object;
+                            }, U extends string | bigint | number | boolean | symbol>(o: T_1): Readonly<T_1>;
+                            freeze<T_1>(o: T_1): Readonly<T_1>;
+                            preventExtensions<T_1>(o: T_1): T_1;
+                            isSealed(o: any): boolean;
+                            isFrozen(o: any): boolean;
+                            isExtensible(o: any): boolean;
+                            keys(o: object): string[];
+                            keys(o: {}): string[];
+                            assign<T_1 extends {}, U_1>(target: T_1, source: U_1): T_1 & U_1;
+                            assign<T_1 extends {}, U_2, V>(target: T_1, source1: U_2, source2: V): T_1 & U_2 & V;
+                            assign<T_1 extends {}, U_3, V_1, W>(target: T_1, source1: U_3, source2: V_1, source3: W): T_1 & U_3 & V_1 & W;
+                            assign(target: object, ...sources: any[]): any;
+                            getOwnPropertySymbols(o: any): symbol[];
+                            is(value1: any, value2: any): boolean;
+                            setPrototypeOf(o: any, proto: object | null): any;
+                            values<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): T_1[];
+                            values(o: {}): any[];
+                            entries<T_1>(o: {
+                                [s: string]: T_1;
+                            } | ArrayLike<T_1>): [string, T_1][];
+                            entries(o: {}): [string, any][];
+                            getOwnPropertyDescriptors<T_1>(o: T_1): { [P in keyof T_1]: TypedPropertyDescriptor<T_1[P]>; } & {
+                                [x: string]: PropertyDescriptor;
+                            };
+                            fromEntries<T_1 = any>(entries: Iterable<readonly [PropertyKey, T_1]>): {
+                                [k: string]: T_1;
+                            };
+                            fromEntries(entries: Iterable<readonly any[]>): any;
+                            hasOwn(o: object, v: PropertyKey): boolean;
+                            groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                        })["default"] | null;
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
+                        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
+                        [Symbol.toStringTag]: string;
+                        [$mol_key_handle](): string;
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
+                        getPrototypeOf(o: any): any;
+                        getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
+                        getOwnPropertyNames(o: any): string[];
+                        create(o: object | null): any;
+                        create(o: object | null, properties: PropertyDescriptorMap & ThisType<any>): any;
+                        defineProperty<T_1>(o: T_1, p: PropertyKey, attributes: PropertyDescriptor & ThisType<any>): T_1;
+                        defineProperties<T_1>(o: T_1, properties: PropertyDescriptorMap & ThisType<any>): T_1;
+                        seal<T_1>(o: T_1): T_1;
+                        freeze<T_1 extends Function>(f: T_1): T_1;
+                        freeze<T_1 extends {
+                            [idx: string]: U | null | undefined | object;
+                        }, U extends string | bigint | number | boolean | symbol>(o: T_1): Readonly<T_1>;
+                        freeze<T_1>(o: T_1): Readonly<T_1>;
+                        preventExtensions<T_1>(o: T_1): T_1;
+                        isSealed(o: any): boolean;
+                        isFrozen(o: any): boolean;
+                        isExtensible(o: any): boolean;
+                        keys(o: object): string[];
+                        keys(o: {}): string[];
+                        assign<T_1 extends {}, U_1>(target: T_1, source: U_1): T_1 & U_1;
+                        assign<T_1 extends {}, U_2, V>(target: T_1, source1: U_2, source2: V): T_1 & U_2 & V;
+                        assign<T_1 extends {}, U_3, V_1, W>(target: T_1, source1: U_3, source2: V_1, source3: W): T_1 & U_3 & V_1 & W;
+                        assign(target: object, ...sources: any[]): any;
+                        getOwnPropertySymbols(o: any): symbol[];
+                        is(value1: any, value2: any): boolean;
+                        setPrototypeOf(o: any, proto: object | null): any;
+                        values<T_1>(o: {
+                            [s: string]: T_1;
+                        } | ArrayLike<T_1>): T_1[];
+                        values(o: {}): any[];
+                        entries<T_1>(o: {
+                            [s: string]: T_1;
+                        } | ArrayLike<T_1>): [string, T_1][];
+                        entries(o: {}): [string, any][];
+                        getOwnPropertyDescriptors<T_1>(o: T_1): { [P in keyof T_1]: TypedPropertyDescriptor<T_1[P]>; } & {
+                            [x: string]: PropertyDescriptor;
+                        };
+                        fromEntries<T_1 = any>(entries: Iterable<readonly [PropertyKey, T_1]>): {
+                            [k: string]: T_1;
+                        };
+                        fromEntries(entries: Iterable<readonly any[]>): any;
+                        hasOwn(o: object, v: PropertyKey): boolean;
+                        groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
+                    };
+                    toString(): any;
+                    tag: keyof typeof $giper_baza_unit_sand_tag;
+                    of<Init extends new (...args: any[]) => any>(init: Init): /*elided*/ any;
+                    meta: null | $giper_baza_link;
+                    make<This extends typeof $mol_object>(this: This, config: Partial<InstanceType<This>>): InstanceType<This>;
+                    $: $;
+                    create<Instance>(this: new (init?: (instance: any) => void) => Instance, init?: (instance: $mol_type_writable<Instance>) => void): Instance;
+                    toJSON(): any;
+                    destructor(): void;
+                    [Symbol.toPrimitive](): any;
+                    [$mol_key_handle](): any;
+                };
+                meta: null | $giper_baza_link;
+                make<This extends typeof $mol_object>(this: This, config: Partial<InstanceType<This>>): InstanceType<This>;
+                $: $;
+                create<Instance>(this: new (init?: (instance: any) => void) => Instance, init?: (instance: $mol_type_writable<Instance>) => void): Instance;
+                toJSON(): any;
+                destructor(): void;
+                [Symbol.toPrimitive](): any;
+                [$mol_key_handle](): any;
+            };
             /** User time in secs */
             readonly Cpu_user: typeof $giper_baza_stat_ranges;
             /** System time in secs */
@@ -26386,6 +27205,7 @@ declare namespace $ {
     export class $giper_baza_app_stat extends $giper_baza_app_stat_base {
         freshness(): number | null;
         uptime(next?: $mol_time_duration): $mol_time_duration;
+        slaves(next?: string[]): readonly string[];
         init(): {
             destructor: () => boolean;
         };
@@ -26431,8 +27251,8 @@ declare namespace $ {
             ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
             remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_flex_subj | null;
             local_ensure(): $giper_baza_flex_subj | null;
-            val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-            val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+            val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+            val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -26474,8 +27294,8 @@ declare namespace $ {
                 ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                 remote_ensure(preset?: $giper_baza_rank_preset): $mol_type_result<$mol_type_result<Value>> | null;
                 local_ensure(): $mol_type_result<$mol_type_result<Value>> | null;
-                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -26528,13 +27348,13 @@ declare namespace $ {
                     };
                     Class: typeof $giper_baza_link;
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                    guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: $giper_baza_link;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -26580,13 +27400,13 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value_1>(value: Value_1): Value_1;
-                default: $giper_baza_link | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
+                default: $giper_baza_link | null;
+                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -26646,13 +27466,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -26696,7 +27516,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                    })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
                             toString(): string;
@@ -26708,13 +27528,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -26758,7 +27578,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined) | null;
+                    })["default"] | null) | null;
                     val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
@@ -26771,13 +27591,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -26821,7 +27641,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                    })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
                             toString(): string;
@@ -26833,13 +27653,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -26883,7 +27703,7 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined) | null;
+                    })["default"] | null) | null;
                     pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                     vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                     vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -26934,13 +27754,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -26986,7 +27806,7 @@ declare namespace $ {
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                     };
                     toString(): string;
-                    guard<Value_1>(value: Value_1): Value_1;
+                    guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
                     default: (Init extends typeof $mol_schema_any ? Init : {
                         new (value?: any): {
                             constructor: Function;
@@ -26999,13 +27819,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -27049,12 +27869,12 @@ declare namespace $ {
                         fromEntries(entries: Iterable<readonly any[]>): any;
                         hasOwn(o: object, v: PropertyKey): boolean;
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                    })["default"] | null | undefined;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    })["default"] | null;
+                    check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -27142,13 +27962,13 @@ declare namespace $ {
                 };
                 Class: typeof $giper_baza_link;
                 toString(): string;
-                guard<Value>(value: Value): Value & $giper_baza_link;
+                guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 default: $giper_baza_link;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -27194,13 +28014,13 @@ declare namespace $ {
                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
             };
             toString(): string;
-            guard<Value>(value: Value): Value;
-            default: $giper_baza_link | null | undefined;
-            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+            default: $giper_baza_link | null;
+            check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
             [Symbol.toStringTag]: string;
             [$mol_key_handle](): string;
-            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
             getPrototypeOf(o: any): any;
             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
             getOwnPropertyNames(o: any): string[];
@@ -27260,13 +28080,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -27310,7 +28130,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -27322,13 +28142,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -27372,7 +28192,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -27385,13 +28205,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -27435,7 +28255,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
                         toString(): string;
@@ -27447,13 +28267,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -27497,7 +28317,7 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined) | null;
+                })["default"] | null) | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -27548,13 +28368,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -27600,7 +28420,7 @@ declare namespace $ {
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                 };
                 toString(): string;
-                guard<Value>(value: Value): Value;
+                guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                 default: (Init extends typeof $mol_schema_any ? Init : {
                     new (value?: any): {
                         constructor: Function;
@@ -27613,13 +28433,13 @@ declare namespace $ {
                     };
                     Class: Init;
                     toString(): string;
-                    guard<Value>(value: Value): Value & InstanceType<Init>;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: InstanceType<Init>;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -27663,12 +28483,12 @@ declare namespace $ {
                     fromEntries(entries: Iterable<readonly any[]>): any;
                     hasOwn(o: object, v: PropertyKey): boolean;
                     groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                })["default"] | null | undefined;
-                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                })["default"] | null;
+                check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                 [Symbol.toStringTag]: string;
                 [$mol_key_handle](): string;
-                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                 getPrototypeOf(o: any): any;
                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                 getOwnPropertyNames(o: any): string[];
@@ -27918,13 +28738,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -27984,13 +28804,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -28046,13 +28866,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -28142,13 +28962,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -28226,13 +29046,13 @@ declare namespace $ {
                     };
                     Class: typeof $giper_baza_link;
                     toString(): string;
-                    guard<Value>(value: Value): Value & $giper_baza_link;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: $giper_baza_link;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -28292,13 +29112,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -28354,13 +29174,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -28450,13 +29270,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value>(value: Value): Value & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -28617,13 +29437,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -28683,13 +29503,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -28745,13 +29565,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -28841,13 +29661,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -28925,13 +29745,13 @@ declare namespace $ {
                     };
                     Class: typeof $giper_baza_link;
                     toString(): string;
-                    guard<Value>(value: Value): Value & $giper_baza_link;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: $giper_baza_link;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -28991,13 +29811,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -29053,13 +29873,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -29149,13 +29969,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value>(value: Value): Value & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -29247,8 +30067,8 @@ declare namespace $ {
                 ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                 remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_flex_meta | null;
                 local_ensure(): $giper_baza_flex_meta | null;
-                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -29288,8 +30108,8 @@ declare namespace $ {
                 ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                 remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_list | null;
                 local_ensure(): $giper_baza_list | null;
-                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -29342,8 +30162,8 @@ declare namespace $ {
                     ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                     remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_flex_meta | null;
                     local_ensure(): $giper_baza_flex_meta | null;
-                    val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                    val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                    val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                    val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                     pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                     vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                     vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -29385,8 +30205,8 @@ declare namespace $ {
                         ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                         remote_ensure(preset?: $giper_baza_rank_preset): $mol_type_result<$mol_type_result<Value>> | null;
                         local_ensure(): $mol_type_result<$mol_type_result<Value>> | null;
-                        val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                        val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                        val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                        val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -29439,13 +30259,13 @@ declare namespace $ {
                             };
                             Class: typeof $giper_baza_link;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: $giper_baza_link;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -29491,13 +30311,13 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1;
-                        default: $giper_baza_link | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
+                        default: $giper_baza_link | null;
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -29557,13 +30377,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -29607,7 +30427,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                            })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
                                     toString(): string;
@@ -29619,13 +30439,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -29669,7 +30489,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined) | null;
+                            })["default"] | null) | null;
                             val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
@@ -29682,13 +30502,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -29732,7 +30552,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                            })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
                                     toString(): string;
@@ -29744,13 +30564,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -29794,7 +30614,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined) | null;
+                            })["default"] | null) | null;
                             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -29845,13 +30665,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -29897,7 +30717,7 @@ declare namespace $ {
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                             };
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1;
+                            guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
                             default: (Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
@@ -29910,13 +30730,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -29960,12 +30780,12 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            })["default"] | null;
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -30053,13 +30873,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value>(value: Value): Value & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -30105,13 +30925,13 @@ declare namespace $ {
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                     };
                     toString(): string;
-                    guard<Value>(value: Value): Value;
-                    default: $giper_baza_link | null | undefined;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                    default: $giper_baza_link | null;
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -30171,13 +30991,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -30221,7 +31041,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -30233,13 +31053,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -30283,7 +31103,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -30296,13 +31116,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -30346,7 +31166,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -30358,13 +31178,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -30408,7 +31228,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -30459,13 +31279,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -30511,7 +31331,7 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value>(value: Value): Value;
+                        guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                         default: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -30524,13 +31344,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -30574,12 +31394,12 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        })["default"] | null;
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -30658,8 +31478,8 @@ declare namespace $ {
                     ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                     remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_list | null;
                     local_ensure(): $giper_baza_list | null;
-                    val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                    val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                    val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                    val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                     pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                     vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                     vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -30701,8 +31521,8 @@ declare namespace $ {
                         ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                         remote_ensure(preset?: $giper_baza_rank_preset): $mol_type_result<$mol_type_result<Value>> | null;
                         local_ensure(): $mol_type_result<$mol_type_result<Value>> | null;
-                        val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                        val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                        val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                        val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -30755,13 +31575,13 @@ declare namespace $ {
                             };
                             Class: typeof $giper_baza_link;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: $giper_baza_link;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -30807,13 +31627,13 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1;
-                        default: $giper_baza_link | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
+                        default: $giper_baza_link | null;
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -30873,13 +31693,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -30923,7 +31743,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                            })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
                                     toString(): string;
@@ -30935,13 +31755,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -30985,7 +31805,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined) | null;
+                            })["default"] | null) | null;
                             val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
@@ -30998,13 +31818,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -31048,7 +31868,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                            })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
                                     toString(): string;
@@ -31060,13 +31880,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -31110,7 +31930,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined) | null;
+                            })["default"] | null) | null;
                             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -31161,13 +31981,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -31213,7 +32033,7 @@ declare namespace $ {
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                             };
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1;
+                            guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
                             default: (Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
@@ -31226,13 +32046,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -31276,12 +32096,12 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            })["default"] | null;
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -31369,13 +32189,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value>(value: Value): Value & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -31421,13 +32241,13 @@ declare namespace $ {
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                     };
                     toString(): string;
-                    guard<Value>(value: Value): Value;
-                    default: $giper_baza_link | null | undefined;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                    default: $giper_baza_link | null;
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -31487,13 +32307,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -31537,7 +32357,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -31549,13 +32369,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -31599,7 +32419,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -31612,13 +32432,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -31662,7 +32482,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -31674,13 +32494,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -31724,7 +32544,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -31775,13 +32595,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -31827,7 +32647,7 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value>(value: Value): Value;
+                        guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                         default: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -31840,13 +32660,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -31890,12 +32710,12 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        })["default"] | null;
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -32119,13 +32939,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -32185,13 +33005,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -32247,13 +33067,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -32343,13 +33163,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -32427,13 +33247,13 @@ declare namespace $ {
                     };
                     Class: typeof $giper_baza_link;
                     toString(): string;
-                    guard<Value>(value: Value): Value & $giper_baza_link;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: $giper_baza_link;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -32493,13 +33313,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -32555,13 +33375,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -32651,13 +33471,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value>(value: Value): Value & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -32745,8 +33565,8 @@ declare namespace $ {
                 ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                 remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_flex_deck | null;
                 local_ensure(): $giper_baza_flex_deck | null;
-                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -32832,8 +33652,8 @@ declare namespace $ {
                     ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                     remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_flex_deck | null;
                     local_ensure(): $giper_baza_flex_deck | null;
-                    val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                    val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                    val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                    val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                     pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                     vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                     vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -32875,8 +33695,8 @@ declare namespace $ {
                         ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                         remote_ensure(preset?: $giper_baza_rank_preset): $mol_type_result<$mol_type_result<Value>> | null;
                         local_ensure(): $mol_type_result<$mol_type_result<Value>> | null;
-                        val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                        val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                        val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                        val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -32929,13 +33749,13 @@ declare namespace $ {
                             };
                             Class: typeof $giper_baza_link;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: $giper_baza_link;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -32981,13 +33801,13 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1;
-                        default: $giper_baza_link | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
+                        default: $giper_baza_link | null;
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -33047,13 +33867,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -33097,7 +33917,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                            })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
                                     toString(): string;
@@ -33109,13 +33929,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -33159,7 +33979,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined) | null;
+                            })["default"] | null) | null;
                             val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
@@ -33172,13 +33992,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -33222,7 +34042,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                            })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
                                     toString(): string;
@@ -33234,13 +34054,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -33284,7 +34104,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined) | null;
+                            })["default"] | null) | null;
                             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -33335,13 +34155,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -33387,7 +34207,7 @@ declare namespace $ {
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                             };
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1;
+                            guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
                             default: (Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
@@ -33400,13 +34220,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -33450,12 +34270,12 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            })["default"] | null;
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -33543,13 +34363,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value>(value: Value): Value & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -33595,13 +34415,13 @@ declare namespace $ {
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                     };
                     toString(): string;
-                    guard<Value>(value: Value): Value;
-                    default: $giper_baza_link | null | undefined;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                    default: $giper_baza_link | null;
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -33661,13 +34481,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -33711,7 +34531,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -33723,13 +34543,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -33773,7 +34593,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -33786,13 +34606,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -33836,7 +34656,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -33848,13 +34668,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -33898,7 +34718,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -33949,13 +34769,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -34001,7 +34821,7 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value>(value: Value): Value;
+                        guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                         default: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -34014,13 +34834,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -34064,12 +34884,12 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        })["default"] | null;
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -34230,13 +35050,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -34296,13 +35116,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -34358,13 +35178,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -34454,13 +35274,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -34538,13 +35358,13 @@ declare namespace $ {
                     };
                     Class: typeof $giper_baza_link;
                     toString(): string;
-                    guard<Value>(value: Value): Value & $giper_baza_link;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: $giper_baza_link;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -34604,13 +35424,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -34666,13 +35486,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -34762,13 +35582,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value>(value: Value): Value & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -34856,8 +35676,8 @@ declare namespace $ {
                 ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                 remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_app_stat | null;
                 local_ensure(): $giper_baza_app_stat | null;
-                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -34905,8 +35725,8 @@ declare namespace $ {
                     ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                     remote_ensure(preset?: $giper_baza_rank_preset): $giper_baza_app_stat | null;
                     local_ensure(): $giper_baza_app_stat | null;
-                    val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                    val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                    val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                    val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                     pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                     vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                     vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -34948,8 +35768,8 @@ declare namespace $ {
                         ensure_lord(peer: $giper_baza_link | null, preset: $giper_baza_rank_preset): void;
                         remote_ensure(preset?: $giper_baza_rank_preset): $mol_type_result<$mol_type_result<Value>> | null;
                         local_ensure(): $mol_type_result<$mol_type_result<Value>> | null;
-                        val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
-                        val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null | undefined;
+                        val(next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
+                        val_of(peer: $giper_baza_link | null, next?: $giper_baza_link | null | undefined): $giper_baza_link | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -35002,13 +35822,13 @@ declare namespace $ {
                             };
                             Class: typeof $giper_baza_link;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: $giper_baza_link;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -35054,13 +35874,13 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1;
-                        default: $giper_baza_link | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
+                        default: $giper_baza_link | null;
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -35120,13 +35940,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -35170,7 +35990,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                            })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
                                     toString(): string;
@@ -35182,13 +36002,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -35232,7 +36052,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined) | null;
+                            })["default"] | null) | null;
                             val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
@@ -35245,13 +36065,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -35295,7 +36115,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                            })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
                                     toString(): string;
@@ -35307,13 +36127,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -35357,7 +36177,7 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined) | null;
+                            })["default"] | null) | null;
                             pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                             vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                             vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -35408,13 +36228,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -35460,7 +36280,7 @@ declare namespace $ {
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                             };
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1;
+                            guard<This extends typeof $mol_schema_any, Value_4>(this: This, value: Value_4): Value_4 & This["default"];
                             default: (Init extends typeof $mol_schema_any ? Init : {
                                 new (value?: any): {
                                     constructor: Function;
@@ -35473,13 +36293,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -35523,12 +36343,12 @@ declare namespace $ {
                                 fromEntries(entries: Iterable<readonly any[]>): any;
                                 hasOwn(o: object, v: PropertyKey): boolean;
                                 groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                            })["default"] | null | undefined;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            })["default"] | null;
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -35616,13 +36436,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value>(value: Value): Value & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -35668,13 +36488,13 @@ declare namespace $ {
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                     };
                     toString(): string;
-                    guard<Value>(value: Value): Value;
-                    default: $giper_baza_link | null | undefined;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                    default: $giper_baza_link | null;
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -35734,13 +36554,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -35784,7 +36604,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -35796,13 +36616,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -35846,7 +36666,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -35859,13 +36679,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -35909,7 +36729,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -35921,13 +36741,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -35971,7 +36791,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -36022,13 +36842,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -36074,7 +36894,7 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value>(value: Value): Value;
+                        guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                         default: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -36087,13 +36907,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -36137,12 +36957,12 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        })["default"] | null;
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -36221,8 +37041,8 @@ declare namespace $ {
     const $giper_baza_flex_user_base: Omit<typeof $giper_baza_flex_subj, "prototype"> & {
         new (...args: any[]): $mol_type_override<$giper_baza_flex_subj, {
             readonly Caret: (auto?: any) => {
-                val(next?: readonly unknown[] | null | undefined): readonly unknown[] | null | undefined;
-                val_of(peer: $giper_baza_link | null, next?: readonly unknown[] | null | undefined): readonly unknown[] | null | undefined;
+                val(next?: readonly unknown[] | null | undefined): readonly unknown[] | null;
+                val_of(peer: $giper_baza_link | null, next?: readonly unknown[] | null | undefined): readonly unknown[] | null;
                 pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                 vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                 vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -36259,8 +37079,8 @@ declare namespace $ {
         } & {
             readonly Caret: {
                 new (): {
-                    val(next?: readonly unknown[] | null | undefined): readonly unknown[] | null | undefined;
-                    val_of(peer: $giper_baza_link | null, next?: readonly unknown[] | null | undefined): readonly unknown[] | null | undefined;
+                    val(next?: readonly unknown[] | null | undefined): readonly unknown[] | null;
+                    val_of(peer: $giper_baza_link | null, next?: readonly unknown[] | null | undefined): readonly unknown[] | null;
                     pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                     vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                     vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -36311,13 +37131,13 @@ declare namespace $ {
                         };
                         Item: typeof $mol_schema_any;
                         toString(): string;
-                        guard<Value>(value: Value): Value & readonly unknown[];
-                        cast(value: unknown): readonly unknown[];
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                        cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: readonly unknown[];
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -36363,13 +37183,13 @@ declare namespace $ {
                         groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                     };
                     toString(): string;
-                    guard<Value>(value: Value): Value;
-                    default: readonly unknown[] | null | undefined;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
+                    default: readonly unknown[] | null;
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -36430,13 +37250,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -36480,7 +37300,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -36492,13 +37312,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -36542,7 +37362,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         val_of(peer: $giper_baza_link | null, next?: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -36555,13 +37375,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -36605,7 +37425,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined): ((Init extends typeof $mol_schema_any ? Init : {
+                        })["default"] | null): ((Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
                                 toString(): string;
@@ -36617,13 +37437,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -36667,7 +37487,7 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined) | null;
+                        })["default"] | null) | null;
                         pick_unit(peer: $giper_baza_link | null): $giper_baza_unit_sand | undefined;
                         vary(next?: $giper_baza_vary_type): $giper_baza_vary_type;
                         vary_of(peer: $giper_baza_link | null, next?: $giper_baza_vary_type): $giper_baza_vary_type;
@@ -36718,13 +37538,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -36770,7 +37590,7 @@ declare namespace $ {
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
                         };
                         toString(): string;
-                        guard<Value>(value: Value): Value;
+                        guard<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): Value_3 & This["default"];
                         default: (Init extends typeof $mol_schema_any ? Init : {
                             new (value?: any): {
                                 constructor: Function;
@@ -36783,13 +37603,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -36833,12 +37653,12 @@ declare namespace $ {
                             fromEntries(entries: Iterable<readonly any[]>): any;
                             hasOwn(o: object, v: PropertyKey): boolean;
                             groupBy<K extends PropertyKey, T>(items: Iterable<T>, keySelector: (item: T, index: number) => K): Partial<Record<K, T[]>>;
-                        })["default"] | null | undefined;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        })["default"] | null;
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -36938,28 +37758,6 @@ declare namespace $ {
 }
 
 declare namespace $ {
-    class $mol_rest_message extends $mol_object {
-        port: $mol_rest_port;
-        method(): string;
-        uri(): URL;
-        type(): $mol_rest_port_mime;
-        origin(): string;
-        address(): string;
-        protocols(): readonly string[];
-        data(): null | string | Uint8Array<ArrayBuffer> | Element | object;
-        bin(): Uint8Array<ArrayBuffer>;
-        text(): string;
-        reply(data: null | string | Uint8Array<ArrayBuffer> | Element | object, meta?: {
-            type?: $mol_rest_port_mime;
-            code?: $mol_rest_code;
-        }): void;
-        route(uri: URL): $mol_rest_message;
-        derive(method: string, data: null | string | Uint8Array<ArrayBuffer> | Element | object): $mol_rest_message;
-        static make<This extends typeof $mol_object>(this: This, config: Partial<InstanceType<This>>): InstanceType<This>;
-    }
-}
-
-declare namespace $ {
     class $mol_rest_resource extends $mol_object {
         REQUEST(msg: $mol_rest_message): any;
         _protocols: readonly string[];
@@ -36991,17 +37789,8 @@ declare namespace $ {
 }
 
 declare namespace $ {
-    class $mol_rest_message_http extends $mol_rest_message {
-        input: InstanceType<$node['http']['IncomingMessage']>;
-        method(): string;
-        uri(): URL;
-        type(): $mol_rest_port_mime;
-        origin(): string;
-        address(): string;
-        protocols(): string[];
-        data(): null | string | Uint8Array<ArrayBuffer> | Element | object;
-        route(uri: URL): $mol_rest_message_http;
-    }
+    /** @deprecated Use $mol_crypto2_hash */
+    let $mol_crypto_hash: typeof $mol_crypto2_hash;
 }
 
 declare namespace $ {
@@ -37014,7 +37803,7 @@ declare namespace $ {
         ws_upgrade(req: InstanceType<$node['http']['IncomingMessage']>, socket: InstanceType<$node['stream']['Duplex']>, head: Buffer<ArrayBuffer>): void;
         _ws_income_chunks: WeakMap<import("node:stream").Duplex, Uint8Array<ArrayBuffer>[]>;
         _ws_income_frames: WeakMap<import("node:stream").Duplex, (string | Uint8Array<ArrayBuffer>)[]>;
-        ws_income(chunk: Buffer<ArrayBuffer>, upgrade: $mol_rest_message, sock: InstanceType<typeof $node.stream.Duplex>): Promise<void>;
+        ws_income(chunk: Buffer<ArrayBuffer>, upgrade: $mol_rest_message, sock: InstanceType<typeof $node.stream.Duplex>): Promise<undefined>;
         root(resource?: $mol_rest_resource): $mol_rest_resource;
     }
 }
@@ -37025,6 +37814,3185 @@ declare namespace $ {
         _root(): $mol_file;
         GET(msg: $mol_rest_message): void;
     }
+}
+
+declare namespace $ {
+    /**
+     * Checks for some of given runtype or throws error.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_variant_demo
+     */
+    function $mol_data_variant<Sub extends $mol_data_value[]>(...sub: Sub): ((val: Parameters<Sub[number]>[0]) => ReturnType<Sub[number]>) & {
+        config: Sub;
+        Value: ReturnType<Sub[number]>;
+    };
+}
+
+declare namespace $ {
+    /**
+     * Checks for string and returns string type.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_string_demo
+     */
+    let $mol_data_string: (val: string) => string;
+}
+
+declare namespace $ {
+    /**
+     * Checks for undefined or passing given runtype.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_optional_demo
+     */
+    function $mol_data_optional<Sub extends $mol_data_value, Fallback extends undefined | (() => ReturnType<Sub>)>(sub: Sub, fallback?: Fallback): ((val: Parameters<Sub>[0] | undefined) => ReturnType<Sub> | (Fallback extends undefined ? undefined : ReturnType<Extract<Fallback, () => any>>)) & {
+        config: {
+            sub: Sub;
+            fallback: Fallback | undefined;
+        };
+        Value: ReturnType<Sub> | (Fallback extends undefined ? undefined : ReturnType<Extract<Fallback, () => any>>);
+    };
+}
+
+declare namespace $ {
+    /**
+     * Fields that can be set to undefined makes optional
+     *
+     * 	type User = $mol_type_partial_undefined<{ name : string , age : number | undefined }> // { name : string , age? : number | undefined }
+     */
+    type $mol_type_partial_undefined<Val> = $mol_type_merge<$mol_type_override<Partial<Val>, Pick<Val, {
+        [Field in keyof Val]: undefined extends Val[Field] ? never : Field;
+    }[keyof Val]>>>;
+}
+
+declare namespace $ {
+    /**
+     * Checks for record of given fields with by its runtypes and returns expected type.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_record_demo
+     */
+    function $mol_data_record<Sub extends Record<string, $mol_data_value>>(sub: Sub): ((val: $mol_type_merge<$mol_type_override<Partial<{ [key in keyof Sub]: Parameters<Sub[key]>[0]; }>, Pick<{ [key in keyof Sub]: Parameters<Sub[key]>[0]; }, { [Field in keyof { [key in keyof Sub]: Parameters<Sub[key]>[0]; }]: undefined extends { [key in keyof Sub]: Parameters<Sub[key]>[0]; }[Field] ? never : Field; }[keyof Sub]>>>) => Readonly<$mol_type_merge<$mol_type_override<Partial<{ [key_1 in keyof Sub]: ReturnType<Sub[key_1]>; }>, Pick<{ [key_1 in keyof Sub]: ReturnType<Sub[key_1]>; }, { [Field_1 in keyof { [key_1 in keyof Sub]: ReturnType<Sub[key_1]>; }]: undefined extends { [key_1 in keyof Sub]: ReturnType<Sub[key_1]>; }[Field_1] ? never : Field_1; }[keyof Sub]>>>>) & {
+        config: Sub;
+        Value: Readonly<$mol_type_merge<$mol_type_override<Partial<{ [key in keyof Sub]: ReturnType<Sub[key]>; }>, Pick<{ [key in keyof Sub]: ReturnType<Sub[key]>; }, { [Field in keyof { [key in keyof Sub]: ReturnType<Sub[key]>; }]: undefined extends { [key in keyof Sub]: ReturnType<Sub[key]>; }[Field] ? never : Field; }[keyof Sub]>>>>;
+    };
+}
+
+declare namespace $ {
+    /**
+     * Checks for array of given runtype and returns expected type.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_array_demo
+     */
+    function $mol_data_array<Sub extends $mol_data_value>(sub: Sub): ((val: readonly Parameters<Sub>[0][]) => readonly ReturnType<Sub>[]) & {
+        config: Sub;
+        Value: readonly ReturnType<Sub>[];
+    };
+}
+
+declare namespace $ {
+    /**
+     * Checks for boolean and returns boolean type.
+     * @see https://mol.hyoo.ru/#!section=demos/demo=mol_data_boolean_demo
+     */
+    let $mol_data_boolean: (val: boolean) => boolean;
+}
+
+declare namespace $ {
+    type $hyoo_harp_query<Field extends string = string> = {
+        [field in Field]: $hyoo_harp_query<never>;
+    } & {
+        '+'?: boolean;
+        '='?: any[][];
+        '!='?: any[][];
+    };
+}
+
+declare namespace $ {
+    function $hyoo_harp_from_string(uri: string): $hyoo_harp_query;
+}
+
+declare namespace $ {
+    function $hyoo_harp_to_string<Query extends $hyoo_harp_query>(query: Query): string;
+}
+
+declare namespace $ {
+    function $hyoo_harp_scheme<Sub extends Record<string, $mol_data_value<any, any>>, Value extends $mol_data_value<any, any> = typeof $mol_data_integer>(sub: Sub, value?: Value): ((val: $mol_type_merge<$mol_type_override<Partial<Sub & {
+        '+': ((val: boolean | undefined) => boolean | undefined) & {
+            config: {
+                sub: (val: boolean) => boolean;
+                fallback: (() => boolean) | undefined;
+            };
+            Value: boolean | undefined;
+        };
+        '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        _num: ((val: {
+            '=': readonly (readonly (string | number)[])[];
+        } | undefined) => Readonly<{
+            '=': readonly (readonly number[])[];
+        }> | undefined) & {
+            config: {
+                sub: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                }) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) & {
+                    config: {
+                        '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                            config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                config: ((this: any, input: string | number) => number) & {
+                                    config: {
+                                        funcs: [((val: string | number) => string | number) & {
+                                            config: [(val: string) => string, typeof $mol_data_integer];
+                                            Value: string | number;
+                                        }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                    };
+                                    Value: number;
+                                };
+                                Value: readonly number[];
+                            };
+                            Value: readonly (readonly number[])[];
+                        };
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>;
+                };
+                fallback: (() => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) | undefined;
+            };
+            Value: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+        };
+        _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+    } extends infer T ? { [key in keyof T]: Parameters<T[key]>[0]; } : never>, Pick<Sub & {
+        '+': ((val: boolean | undefined) => boolean | undefined) & {
+            config: {
+                sub: (val: boolean) => boolean;
+                fallback: (() => boolean) | undefined;
+            };
+            Value: boolean | undefined;
+        };
+        '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        _num: ((val: {
+            '=': readonly (readonly (string | number)[])[];
+        } | undefined) => Readonly<{
+            '=': readonly (readonly number[])[];
+        }> | undefined) & {
+            config: {
+                sub: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                }) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) & {
+                    config: {
+                        '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                            config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                config: ((this: any, input: string | number) => number) & {
+                                    config: {
+                                        funcs: [((val: string | number) => string | number) & {
+                                            config: [(val: string) => string, typeof $mol_data_integer];
+                                            Value: string | number;
+                                        }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                    };
+                                    Value: number;
+                                };
+                                Value: readonly number[];
+                            };
+                            Value: readonly (readonly number[])[];
+                        };
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>;
+                };
+                fallback: (() => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) | undefined;
+            };
+            Value: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+        };
+        _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+    } extends infer T_1 ? { [key in keyof T_1]: Parameters<T_1[key]>[0]; } : never, ((Sub & {
+        '+': ((val: boolean | undefined) => boolean | undefined) & {
+            config: {
+                sub: (val: boolean) => boolean;
+                fallback: (() => boolean) | undefined;
+            };
+            Value: boolean | undefined;
+        };
+        '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        _num: ((val: {
+            '=': readonly (readonly (string | number)[])[];
+        } | undefined) => Readonly<{
+            '=': readonly (readonly number[])[];
+        }> | undefined) & {
+            config: {
+                sub: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                }) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) & {
+                    config: {
+                        '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                            config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                config: ((this: any, input: string | number) => number) & {
+                                    config: {
+                                        funcs: [((val: string | number) => string | number) & {
+                                            config: [(val: string) => string, typeof $mol_data_integer];
+                                            Value: string | number;
+                                        }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                    };
+                                    Value: number;
+                                };
+                                Value: readonly number[];
+                            };
+                            Value: readonly (readonly number[])[];
+                        };
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>;
+                };
+                fallback: (() => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) | undefined;
+            };
+            Value: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+        };
+        _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+    } extends infer T_3 ? { [key in keyof T_3]: Parameters<T_3[key]>[0]; } : never) extends infer T_2 ? { [Field in keyof T_2]: undefined extends T_2[Field] ? never : Field; } : never)["+" | "=" | "!=" | "_num" | keyof Sub | "_len" | "_max" | "_min" | "_sum"]>>>) => Readonly<$mol_type_merge<$mol_type_override<Partial<Sub & {
+        '+': ((val: boolean | undefined) => boolean | undefined) & {
+            config: {
+                sub: (val: boolean) => boolean;
+                fallback: (() => boolean) | undefined;
+            };
+            Value: boolean | undefined;
+        };
+        '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        _num: ((val: {
+            '=': readonly (readonly (string | number)[])[];
+        } | undefined) => Readonly<{
+            '=': readonly (readonly number[])[];
+        }> | undefined) & {
+            config: {
+                sub: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                }) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) & {
+                    config: {
+                        '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                            config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                config: ((this: any, input: string | number) => number) & {
+                                    config: {
+                                        funcs: [((val: string | number) => string | number) & {
+                                            config: [(val: string) => string, typeof $mol_data_integer];
+                                            Value: string | number;
+                                        }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                    };
+                                    Value: number;
+                                };
+                                Value: readonly number[];
+                            };
+                            Value: readonly (readonly number[])[];
+                        };
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>;
+                };
+                fallback: (() => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) | undefined;
+            };
+            Value: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+        };
+        _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+    } extends infer T_4 ? { [key_1 in keyof T_4]: ReturnType<T_4[key_1]>; } : never>, Pick<Sub & {
+        '+': ((val: boolean | undefined) => boolean | undefined) & {
+            config: {
+                sub: (val: boolean) => boolean;
+                fallback: (() => boolean) | undefined;
+            };
+            Value: boolean | undefined;
+        };
+        '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        _num: ((val: {
+            '=': readonly (readonly (string | number)[])[];
+        } | undefined) => Readonly<{
+            '=': readonly (readonly number[])[];
+        }> | undefined) & {
+            config: {
+                sub: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                }) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) & {
+                    config: {
+                        '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                            config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                config: ((this: any, input: string | number) => number) & {
+                                    config: {
+                                        funcs: [((val: string | number) => string | number) & {
+                                            config: [(val: string) => string, typeof $mol_data_integer];
+                                            Value: string | number;
+                                        }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                    };
+                                    Value: number;
+                                };
+                                Value: readonly number[];
+                            };
+                            Value: readonly (readonly number[])[];
+                        };
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>;
+                };
+                fallback: (() => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) | undefined;
+            };
+            Value: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+        };
+        _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+    } extends infer T_5 ? { [key_1 in keyof T_5]: ReturnType<T_5[key_1]>; } : never, ((Sub & {
+        '+': ((val: boolean | undefined) => boolean | undefined) & {
+            config: {
+                sub: (val: boolean) => boolean;
+                fallback: (() => boolean) | undefined;
+            };
+            Value: boolean | undefined;
+        };
+        '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+            config: {
+                sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                    config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                        config: Value;
+                        Value: readonly ReturnType<Value>[];
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[];
+                };
+                fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+            };
+            Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+        };
+        _num: ((val: {
+            '=': readonly (readonly (string | number)[])[];
+        } | undefined) => Readonly<{
+            '=': readonly (readonly number[])[];
+        }> | undefined) & {
+            config: {
+                sub: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                }) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) & {
+                    config: {
+                        '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                            config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                config: ((this: any, input: string | number) => number) & {
+                                    config: {
+                                        funcs: [((val: string | number) => string | number) & {
+                                            config: [(val: string) => string, typeof $mol_data_integer];
+                                            Value: string | number;
+                                        }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                    };
+                                    Value: number;
+                                };
+                                Value: readonly number[];
+                            };
+                            Value: readonly (readonly number[])[];
+                        };
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>;
+                };
+                fallback: (() => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }>) | undefined;
+            };
+            Value: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+        };
+        _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+    } extends infer T_7 ? { [key_1 in keyof T_7]: ReturnType<T_7[key_1]>; } : never) extends infer T_6 ? { [Field_1 in keyof T_6]: undefined extends T_6[Field_1] ? never : Field_1; } : never)["+" | "=" | "!=" | "_num" | keyof Sub | "_len" | "_max" | "_min" | "_sum"]>>>>) & {
+        config: Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        };
+        Value: Readonly<$mol_type_merge<$mol_type_override<Partial<Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T]: ReturnType<T[key]>; } : never>, Pick<Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_1 extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T_1]: ReturnType<T_1[key]>; } : never, ((Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_3 extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T_3]: ReturnType<T_3[key]>; } : never) extends infer T_2 ? { [Field in keyof T_2]: undefined extends T_2[Field] ? never : Field; } : never)["+" | "=" | "!=" | "_num" | keyof Sub | "_len" | "_max" | "_min" | "_sum"]>>>>;
+    } & {
+        parse(str: string): Readonly<$mol_type_merge<$mol_type_override<Partial<Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_4 extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T_4]: ReturnType<T_4[key]>; } : never>, Pick<Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_5 extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T_5]: ReturnType<T_5[key]>; } : never, ((Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_7 extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T_7]: ReturnType<T_7[key]>; } : never) extends infer T_6 ? { [Field in keyof T_6]: undefined extends T_6[Field] ? never : Field; } : never)["+" | "=" | "!=" | "_num" | keyof Sub | "_len" | "_max" | "_min" | "_sum"]>>>>;
+        build(query: Parameters<((val: $mol_type_merge<$mol_type_override<Partial<Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_4 ? { [key_1 in keyof T_4]: Parameters<T_4[key_1]>[0]; } : never>, Pick<Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_5 ? { [key_1 in keyof T_5]: Parameters<T_5[key_1]>[0]; } : never, ((Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_7 ? { [key_1 in keyof T_7]: Parameters<T_7[key_1]>[0]; } : never) extends infer T_6 ? { [Field_1 in keyof T_6]: undefined extends T_6[Field_1] ? never : Field_1; } : never)["+" | "=" | "!=" | "_num" | keyof Sub | "_len" | "_max" | "_min" | "_sum"]>>>) => Readonly<$mol_type_merge<$mol_type_override<Partial<Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_8 ? { [key in keyof T_8]: ReturnType<T_8[key]>; } : never>, Pick<Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_9 ? { [key in keyof T_9]: ReturnType<T_9[key]>; } : never, ((Sub & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                        config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                            config: Value;
+                            Value: readonly ReturnType<Value>[];
+                        };
+                        Value: readonly (readonly ReturnType<Value>[])[];
+                    };
+                    fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                };
+                Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+        } extends infer T_11 ? { [key in keyof T_11]: ReturnType<T_11[key]>; } : never) extends infer T_10 ? { [Field in keyof T_10]: undefined extends T_10[Field] ? never : Field; } : never)["+" | "=" | "!=" | "_num" | keyof Sub | "_len" | "_max" | "_min" | "_sum"]>>>>) & {
+            config: Sub & {
+                '+': ((val: boolean | undefined) => boolean | undefined) & {
+                    config: {
+                        sub: (val: boolean) => boolean;
+                        fallback: (() => boolean) | undefined;
+                    };
+                    Value: boolean | undefined;
+                };
+                '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                    config: {
+                        sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                            config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                                config: Value;
+                                Value: readonly ReturnType<Value>[];
+                            };
+                            Value: readonly (readonly ReturnType<Value>[])[];
+                        };
+                        fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+                };
+                '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                    config: {
+                        sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                            config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                                config: Value;
+                                Value: readonly ReturnType<Value>[];
+                            };
+                            Value: readonly (readonly ReturnType<Value>[])[];
+                        };
+                        fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+                };
+                _num: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined) & {
+                    config: {
+                        sub: ((val: {
+                            '=': readonly (readonly (string | number)[])[];
+                        }) => Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>) & {
+                            config: {
+                                '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                    config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                        config: ((this: any, input: string | number) => number) & {
+                                            config: {
+                                                funcs: [((val: string | number) => string | number) & {
+                                                    config: [(val: string) => string, typeof $mol_data_integer];
+                                                    Value: string | number;
+                                                }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                            };
+                                            Value: number;
+                                        };
+                                        Value: readonly number[];
+                                    };
+                                    Value: readonly (readonly number[])[];
+                                };
+                            };
+                            Value: Readonly<{
+                                '=': readonly (readonly number[])[];
+                            }>;
+                        };
+                        fallback: (() => Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>) | undefined;
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                };
+                _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            };
+            Value: Readonly<$mol_type_merge<$mol_type_override<Partial<Sub & {
+                '+': ((val: boolean | undefined) => boolean | undefined) & {
+                    config: {
+                        sub: (val: boolean) => boolean;
+                        fallback: (() => boolean) | undefined;
+                    };
+                    Value: boolean | undefined;
+                };
+                '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                    config: {
+                        sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                            config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                                config: Value;
+                                Value: readonly ReturnType<Value>[];
+                            };
+                            Value: readonly (readonly ReturnType<Value>[])[];
+                        };
+                        fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+                };
+                '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                    config: {
+                        sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                            config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                                config: Value;
+                                Value: readonly ReturnType<Value>[];
+                            };
+                            Value: readonly (readonly ReturnType<Value>[])[];
+                        };
+                        fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+                };
+                _num: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined) & {
+                    config: {
+                        sub: ((val: {
+                            '=': readonly (readonly (string | number)[])[];
+                        }) => Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>) & {
+                            config: {
+                                '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                    config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                        config: ((this: any, input: string | number) => number) & {
+                                            config: {
+                                                funcs: [((val: string | number) => string | number) & {
+                                                    config: [(val: string) => string, typeof $mol_data_integer];
+                                                    Value: string | number;
+                                                }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                            };
+                                            Value: number;
+                                        };
+                                        Value: readonly number[];
+                                    };
+                                    Value: readonly (readonly number[])[];
+                                };
+                            };
+                            Value: Readonly<{
+                                '=': readonly (readonly number[])[];
+                            }>;
+                        };
+                        fallback: (() => Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>) | undefined;
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                };
+                _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            } extends infer T_4 extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T_4]: ReturnType<T_4[key]>; } : never>, Pick<Sub & {
+                '+': ((val: boolean | undefined) => boolean | undefined) & {
+                    config: {
+                        sub: (val: boolean) => boolean;
+                        fallback: (() => boolean) | undefined;
+                    };
+                    Value: boolean | undefined;
+                };
+                '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                    config: {
+                        sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                            config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                                config: Value;
+                                Value: readonly ReturnType<Value>[];
+                            };
+                            Value: readonly (readonly ReturnType<Value>[])[];
+                        };
+                        fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+                };
+                '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                    config: {
+                        sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                            config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                                config: Value;
+                                Value: readonly ReturnType<Value>[];
+                            };
+                            Value: readonly (readonly ReturnType<Value>[])[];
+                        };
+                        fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+                };
+                _num: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined) & {
+                    config: {
+                        sub: ((val: {
+                            '=': readonly (readonly (string | number)[])[];
+                        }) => Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>) & {
+                            config: {
+                                '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                    config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                        config: ((this: any, input: string | number) => number) & {
+                                            config: {
+                                                funcs: [((val: string | number) => string | number) & {
+                                                    config: [(val: string) => string, typeof $mol_data_integer];
+                                                    Value: string | number;
+                                                }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                            };
+                                            Value: number;
+                                        };
+                                        Value: readonly number[];
+                                    };
+                                    Value: readonly (readonly number[])[];
+                                };
+                            };
+                            Value: Readonly<{
+                                '=': readonly (readonly number[])[];
+                            }>;
+                        };
+                        fallback: (() => Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>) | undefined;
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                };
+                _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            } extends infer T_5 extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T_5]: ReturnType<T_5[key]>; } : never, ((Sub & {
+                '+': ((val: boolean | undefined) => boolean | undefined) & {
+                    config: {
+                        sub: (val: boolean) => boolean;
+                        fallback: (() => boolean) | undefined;
+                    };
+                    Value: boolean | undefined;
+                };
+                '=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                    config: {
+                        sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                            config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                                config: Value;
+                                Value: readonly ReturnType<Value>[];
+                            };
+                            Value: readonly (readonly ReturnType<Value>[])[];
+                        };
+                        fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+                };
+                '!=': ((val: readonly (readonly Parameters<Value>[0][])[] | undefined) => readonly (readonly ReturnType<Value>[])[] | undefined) & {
+                    config: {
+                        sub: ((val: readonly (readonly Parameters<Value>[0][])[]) => readonly (readonly ReturnType<Value>[])[]) & {
+                            config: ((val: readonly Parameters<Value>[0][]) => readonly ReturnType<Value>[]) & {
+                                config: Value;
+                                Value: readonly ReturnType<Value>[];
+                            };
+                            Value: readonly (readonly ReturnType<Value>[])[];
+                        };
+                        fallback: (() => readonly (readonly ReturnType<Value>[])[]) | undefined;
+                    };
+                    Value: readonly (readonly ReturnType<Value>[])[] | undefined;
+                };
+                _num: ((val: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined) => Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined) & {
+                    config: {
+                        sub: ((val: {
+                            '=': readonly (readonly (string | number)[])[];
+                        }) => Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>) & {
+                            config: {
+                                '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                    config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                        config: ((this: any, input: string | number) => number) & {
+                                            config: {
+                                                funcs: [((val: string | number) => string | number) & {
+                                                    config: [(val: string) => string, typeof $mol_data_integer];
+                                                    Value: string | number;
+                                                }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                            };
+                                            Value: number;
+                                        };
+                                        Value: readonly number[];
+                                    };
+                                    Value: readonly (readonly number[])[];
+                                };
+                            };
+                            Value: Readonly<{
+                                '=': readonly (readonly number[])[];
+                            }>;
+                        };
+                        fallback: (() => Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>) | undefined;
+                    };
+                    Value: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                };
+                _len: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _max: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _min: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+                _sum: $mol_data_value<Readonly<{ [Key in keyof Sub]: Parameters<Sub[Key]>[0]; }> | undefined, Readonly<{ [Key_1 in keyof Sub]: ReturnType<Sub[Key_1]>; }> | undefined>;
+            } extends infer T_7 extends Record<string, $mol_data_value<any, any>> ? { [key in keyof T_7]: ReturnType<T_7[key]>; } : never) extends infer T_6 ? { [Field in keyof T_6]: undefined extends T_6[Field] ? never : Field; } : never)["+" | "=" | "!=" | "_num" | keyof Sub | "_len" | "_max" | "_min" | "_sum"]>>>>;
+        }>[0]): string;
+    };
+}
+
+declare namespace $ {
+    export function $giper_baza_file_mime_safe(type: string): string;
+    export const $giper_baza_file_query: ((val: {
+        '+'?: boolean | undefined;
+        '='?: readonly (readonly number[])[] | undefined;
+        '!='?: readonly (readonly number[])[] | undefined;
+        _num?: {
+            '=': readonly (readonly (string | number)[])[];
+        } | undefined;
+        _len?: Readonly<{
+            BAZA: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+            file: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+        }> | undefined;
+        _max?: Readonly<{
+            BAZA: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+            file: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+        }> | undefined;
+        _min?: Readonly<{
+            BAZA: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+            file: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+        }> | undefined;
+        _sum?: Readonly<{
+            BAZA: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+            file: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+        }> | undefined;
+        BAZA: {
+            '+'?: boolean | undefined;
+            '='?: readonly (readonly number[])[] | undefined;
+            '!='?: readonly (readonly number[])[] | undefined;
+            _num?: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined;
+            _len?: Readonly<{}> | undefined;
+            _max?: Readonly<{}> | undefined;
+            _min?: Readonly<{}> | undefined;
+            _sum?: Readonly<{}> | undefined;
+        };
+        file: {
+            '+'?: boolean | undefined;
+            '='?: readonly (readonly string[])[] | undefined;
+            '!='?: readonly (readonly string[])[] | undefined;
+            _num?: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined;
+            _len?: Readonly<{}> | undefined;
+            _max?: Readonly<{}> | undefined;
+            _min?: Readonly<{}> | undefined;
+            _sum?: Readonly<{}> | undefined;
+        };
+    }) => Readonly<{
+        '+'?: boolean | undefined;
+        '='?: readonly (readonly number[])[] | undefined;
+        '!='?: readonly (readonly number[])[] | undefined;
+        _num?: Readonly<{
+            '=': readonly (readonly number[])[];
+        }> | undefined;
+        _len?: Readonly<{
+            BAZA: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+            file: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+        }> | undefined;
+        _max?: Readonly<{
+            BAZA: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+            file: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+        }> | undefined;
+        _min?: Readonly<{
+            BAZA: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+            file: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+        }> | undefined;
+        _sum?: Readonly<{
+            BAZA: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+            file: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+        }> | undefined;
+        BAZA: Readonly<{
+            '+'?: boolean | undefined;
+            '='?: readonly (readonly number[])[] | undefined;
+            '!='?: readonly (readonly number[])[] | undefined;
+            _num?: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+            _len?: Readonly<{}> | undefined;
+            _max?: Readonly<{}> | undefined;
+            _min?: Readonly<{}> | undefined;
+            _sum?: Readonly<{}> | undefined;
+        }>;
+        file: Readonly<{
+            '+'?: boolean | undefined;
+            '='?: readonly (readonly string[])[] | undefined;
+            '!='?: readonly (readonly string[])[] | undefined;
+            _num?: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+            _len?: Readonly<{}> | undefined;
+            _max?: Readonly<{}> | undefined;
+            _min?: Readonly<{}> | undefined;
+            _sum?: Readonly<{}> | undefined;
+        }>;
+    }>) & {
+        config: {
+            BAZA: ((val: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }) => Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>) & {
+                config: {
+                    '+': ((val: boolean | undefined) => boolean | undefined) & {
+                        config: {
+                            sub: (val: boolean) => boolean;
+                            fallback: (() => boolean) | undefined;
+                        };
+                        Value: boolean | undefined;
+                    };
+                    '=': ((val: readonly (readonly number[])[] | undefined) => readonly (readonly number[])[] | undefined) & {
+                        config: {
+                            sub: ((val: readonly (readonly number[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly number[]) => readonly number[]) & {
+                                    config: typeof $mol_data_integer;
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                            fallback: (() => readonly (readonly number[])[]) | undefined;
+                        };
+                        Value: readonly (readonly number[])[] | undefined;
+                    };
+                    '!=': ((val: readonly (readonly number[])[] | undefined) => readonly (readonly number[])[] | undefined) & {
+                        config: {
+                            sub: ((val: readonly (readonly number[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly number[]) => readonly number[]) & {
+                                    config: typeof $mol_data_integer;
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                            fallback: (() => readonly (readonly number[])[]) | undefined;
+                        };
+                        Value: readonly (readonly number[])[] | undefined;
+                    };
+                    _num: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined) & {
+                        config: {
+                            sub: ((val: {
+                                '=': readonly (readonly (string | number)[])[];
+                            }) => Readonly<{
+                                '=': readonly (readonly number[])[];
+                            }>) & {
+                                config: {
+                                    '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                        config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                            config: ((this: any, input: string | number) => number) & {
+                                                config: {
+                                                    funcs: [((val: string | number) => string | number) & {
+                                                        config: [(val: string) => string, typeof $mol_data_integer];
+                                                        Value: string | number;
+                                                    }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                                };
+                                                Value: number;
+                                            };
+                                            Value: readonly number[];
+                                        };
+                                        Value: readonly (readonly number[])[];
+                                    };
+                                };
+                                Value: Readonly<{
+                                    '=': readonly (readonly number[])[];
+                                }>;
+                            };
+                            fallback: (() => Readonly<{
+                                '=': readonly (readonly number[])[];
+                            }>) | undefined;
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }> | undefined;
+                    };
+                    _len: $mol_data_value<Readonly<{}> | undefined, Readonly<{}> | undefined>;
+                    _max: $mol_data_value<Readonly<{}> | undefined, Readonly<{}> | undefined>;
+                    _min: $mol_data_value<Readonly<{}> | undefined, Readonly<{}> | undefined>;
+                    _sum: $mol_data_value<Readonly<{}> | undefined, Readonly<{}> | undefined>;
+                };
+                Value: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            } & {
+                parse(str: string): Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                build(query: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }): string;
+            };
+            file: ((val: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }) => Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>) & {
+                config: {
+                    '+': ((val: boolean | undefined) => boolean | undefined) & {
+                        config: {
+                            sub: (val: boolean) => boolean;
+                            fallback: (() => boolean) | undefined;
+                        };
+                        Value: boolean | undefined;
+                    };
+                    '=': ((val: readonly (readonly string[])[] | undefined) => readonly (readonly string[])[] | undefined) & {
+                        config: {
+                            sub: ((val: readonly (readonly string[])[]) => readonly (readonly string[])[]) & {
+                                config: ((val: readonly string[]) => readonly string[]) & {
+                                    config: (val: string) => string;
+                                    Value: readonly string[];
+                                };
+                                Value: readonly (readonly string[])[];
+                            };
+                            fallback: (() => readonly (readonly string[])[]) | undefined;
+                        };
+                        Value: readonly (readonly string[])[] | undefined;
+                    };
+                    '!=': ((val: readonly (readonly string[])[] | undefined) => readonly (readonly string[])[] | undefined) & {
+                        config: {
+                            sub: ((val: readonly (readonly string[])[]) => readonly (readonly string[])[]) & {
+                                config: ((val: readonly string[]) => readonly string[]) & {
+                                    config: (val: string) => string;
+                                    Value: readonly string[];
+                                };
+                                Value: readonly (readonly string[])[];
+                            };
+                            fallback: (() => readonly (readonly string[])[]) | undefined;
+                        };
+                        Value: readonly (readonly string[])[] | undefined;
+                    };
+                    _num: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined) & {
+                        config: {
+                            sub: ((val: {
+                                '=': readonly (readonly (string | number)[])[];
+                            }) => Readonly<{
+                                '=': readonly (readonly number[])[];
+                            }>) & {
+                                config: {
+                                    '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                        config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                            config: ((this: any, input: string | number) => number) & {
+                                                config: {
+                                                    funcs: [((val: string | number) => string | number) & {
+                                                        config: [(val: string) => string, typeof $mol_data_integer];
+                                                        Value: string | number;
+                                                    }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                                };
+                                                Value: number;
+                                            };
+                                            Value: readonly number[];
+                                        };
+                                        Value: readonly (readonly number[])[];
+                                    };
+                                };
+                                Value: Readonly<{
+                                    '=': readonly (readonly number[])[];
+                                }>;
+                            };
+                            fallback: (() => Readonly<{
+                                '=': readonly (readonly number[])[];
+                            }>) | undefined;
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }> | undefined;
+                    };
+                    _len: $mol_data_value<Readonly<{}> | undefined, Readonly<{}> | undefined>;
+                    _max: $mol_data_value<Readonly<{}> | undefined, Readonly<{}> | undefined>;
+                    _min: $mol_data_value<Readonly<{}> | undefined, Readonly<{}> | undefined>;
+                    _sum: $mol_data_value<Readonly<{}> | undefined, Readonly<{}> | undefined>;
+                };
+                Value: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            } & {
+                parse(str: string): Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                build(query: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }): string;
+            };
+        } & {
+            '+': ((val: boolean | undefined) => boolean | undefined) & {
+                config: {
+                    sub: (val: boolean) => boolean;
+                    fallback: (() => boolean) | undefined;
+                };
+                Value: boolean | undefined;
+            };
+            '=': ((val: readonly (readonly number[])[] | undefined) => readonly (readonly number[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly number[])[]) => readonly (readonly number[])[]) & {
+                        config: ((val: readonly number[]) => readonly number[]) & {
+                            config: typeof $mol_data_integer;
+                            Value: readonly number[];
+                        };
+                        Value: readonly (readonly number[])[];
+                    };
+                    fallback: (() => readonly (readonly number[])[]) | undefined;
+                };
+                Value: readonly (readonly number[])[] | undefined;
+            };
+            '!=': ((val: readonly (readonly number[])[] | undefined) => readonly (readonly number[])[] | undefined) & {
+                config: {
+                    sub: ((val: readonly (readonly number[])[]) => readonly (readonly number[])[]) & {
+                        config: ((val: readonly number[]) => readonly number[]) & {
+                            config: typeof $mol_data_integer;
+                            Value: readonly number[];
+                        };
+                        Value: readonly (readonly number[])[];
+                    };
+                    fallback: (() => readonly (readonly number[])[]) | undefined;
+                };
+                Value: readonly (readonly number[])[] | undefined;
+            };
+            _num: ((val: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined) => Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined) & {
+                config: {
+                    sub: ((val: {
+                        '=': readonly (readonly (string | number)[])[];
+                    }) => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) & {
+                        config: {
+                            '=': ((val: readonly (readonly (string | number)[])[]) => readonly (readonly number[])[]) & {
+                                config: ((val: readonly (string | number)[]) => readonly number[]) & {
+                                    config: ((this: any, input: string | number) => number) & {
+                                        config: {
+                                            funcs: [((val: string | number) => string | number) & {
+                                                config: [(val: string) => string, typeof $mol_data_integer];
+                                                Value: string | number;
+                                            }, NumberConstructor] & [(input: string | number) => any, (input: any) => unknown];
+                                        };
+                                        Value: number;
+                                    };
+                                    Value: readonly number[];
+                                };
+                                Value: readonly (readonly number[])[];
+                            };
+                        };
+                        Value: Readonly<{
+                            '=': readonly (readonly number[])[];
+                        }>;
+                    };
+                    fallback: (() => Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }>) | undefined;
+                };
+                Value: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+            };
+            _len: $mol_data_value<Readonly<{
+                BAZA: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+                file: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+            }> | undefined, Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined>;
+            _max: $mol_data_value<Readonly<{
+                BAZA: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+                file: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+            }> | undefined, Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined>;
+            _min: $mol_data_value<Readonly<{
+                BAZA: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+                file: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+            }> | undefined, Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined>;
+            _sum: $mol_data_value<Readonly<{
+                BAZA: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+                file: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+            }> | undefined, Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined>;
+        };
+        Value: Readonly<{
+            '+'?: boolean | undefined;
+            '='?: readonly (readonly number[])[] | undefined;
+            '!='?: readonly (readonly number[])[] | undefined;
+            _num?: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+            _len?: Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined;
+            _max?: Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined;
+            _min?: Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined;
+            _sum?: Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined;
+            BAZA: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+            file: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+        }>;
+    } & {
+        parse(str: string): Readonly<{
+            '+'?: boolean | undefined;
+            '='?: readonly (readonly number[])[] | undefined;
+            '!='?: readonly (readonly number[])[] | undefined;
+            _num?: Readonly<{
+                '=': readonly (readonly number[])[];
+            }> | undefined;
+            _len?: Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined;
+            _max?: Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined;
+            _min?: Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined;
+            _sum?: Readonly<{
+                BAZA: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+                file: Readonly<{
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: Readonly<{
+                        '=': readonly (readonly number[])[];
+                    }> | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                }>;
+            }> | undefined;
+            BAZA: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+            file: Readonly<{
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: Readonly<{
+                    '=': readonly (readonly number[])[];
+                }> | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            }>;
+        }>;
+        build(query: {
+            '+'?: boolean | undefined;
+            '='?: readonly (readonly number[])[] | undefined;
+            '!='?: readonly (readonly number[])[] | undefined;
+            _num?: {
+                '=': readonly (readonly (string | number)[])[];
+            } | undefined;
+            _len?: Readonly<{
+                BAZA: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+                file: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+            }> | undefined;
+            _max?: Readonly<{
+                BAZA: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+                file: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+            }> | undefined;
+            _min?: Readonly<{
+                BAZA: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+                file: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+            }> | undefined;
+            _sum?: Readonly<{
+                BAZA: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly number[])[] | undefined;
+                    '!='?: readonly (readonly number[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+                file: {
+                    '+'?: boolean | undefined;
+                    '='?: readonly (readonly string[])[] | undefined;
+                    '!='?: readonly (readonly string[])[] | undefined;
+                    _num?: {
+                        '=': readonly (readonly (string | number)[])[];
+                    } | undefined;
+                    _len?: Readonly<{}> | undefined;
+                    _max?: Readonly<{}> | undefined;
+                    _min?: Readonly<{}> | undefined;
+                    _sum?: Readonly<{}> | undefined;
+                };
+            }> | undefined;
+            BAZA: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly number[])[] | undefined;
+                '!='?: readonly (readonly number[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+            file: {
+                '+'?: boolean | undefined;
+                '='?: readonly (readonly string[])[] | undefined;
+                '!='?: readonly (readonly string[])[] | undefined;
+                _num?: {
+                    '=': readonly (readonly (string | number)[])[];
+                } | undefined;
+                _len?: Readonly<{}> | undefined;
+                _max?: Readonly<{}> | undefined;
+                _min?: Readonly<{}> | undefined;
+                _sum?: Readonly<{}> | undefined;
+            };
+        }): string;
+    };
+    const $giper_baza_file_base: Omit<typeof $giper_baza_dict, "prototype"> & {
+        new (...args: any[]): $mol_type_override<$giper_baza_dict, {
+            readonly Name: (auto?: any) => $giper_baza_atom_text | null;
+            readonly Type: (auto?: any) => $giper_baza_atom_text | null;
+            readonly Chunks: (auto?: any) => $giper_baza_list_bin | null;
+        }>;
+        path: string;
+    } & {
+        schema: {
+            [x: string]: typeof $giper_baza_pawn;
+        } & {
+            /** File name */
+            readonly Name: typeof $giper_baza_atom_text;
+            /** File Content-Type */
+            readonly Type: typeof $giper_baza_atom_text;
+            /** File content in chunks - list of binaries */
+            readonly Chunks: typeof $giper_baza_list_bin;
+        };
+    };
+    export class $giper_baza_file extends $giper_baza_file_base {
+        /** Persistent URI to file content */
+        uri(): string;
+        /** File name */
+        name(next?: string | null): string;
+        /** Mime type */
+        type(next?: string | null): string;
+        /** Blob, File etc. */
+        blob(next?: $mol_blob): $mol_blob;
+        /** Solid byte buffer. */
+        buffer(next?: Uint8Array<ArrayBuffer>): Uint8Array<ArrayBuffer>;
+        chunks(next?: readonly Uint8Array<ArrayBuffer>[]): Uint8Array<ArrayBuffer>[];
+        str(next?: string, type?: string): string;
+        json(next?: any, type?: string): any;
+    }
+    export {};
 }
 
 declare namespace $ {
@@ -37044,6 +41012,8 @@ declare namespace $ {
     class $giper_baza_app_node extends $mol_rest_resource_fs {
         link(): $giper_baza_app_node_link;
         _protocols: string[];
+        GET(msg: $mol_rest_message): void;
+        _yard(): $giper_baza_yard;
         OPEN(msg: $mol_rest_message): string;
         POST(msg: $mol_rest_message): void;
         CLOSE(msg: $mol_rest_message): void;
@@ -37244,13 +41214,13 @@ declare namespace $ {
                         };
                         Class: typeof $giper_baza_link;
                         toString(): string;
-                        guard<Value_1>(value: Value_1): Value_1 & $giper_baza_link;
+                        guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: $giper_baza_link;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -37310,13 +41280,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -37372,13 +41342,13 @@ declare namespace $ {
                                 };
                                 Class: Init;
                                 toString(): string;
-                                guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                                guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                                 cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                                 default: InstanceType<Init>;
-                                check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                                check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                                 [Symbol.toStringTag]: string;
                                 [$mol_key_handle](): string;
-                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                                [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                                 getPrototypeOf(o: any): any;
                                 getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                                 getOwnPropertyNames(o: any): string[];
@@ -37468,13 +41438,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value_1>(value: Value_1): Value_1 & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): Value_1 & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_3>(this: This, value: Value_3): value is Value_3 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -37552,13 +41522,13 @@ declare namespace $ {
                     };
                     Class: typeof $giper_baza_link;
                     toString(): string;
-                    guard<Value>(value: Value): Value & $giper_baza_link;
+                    guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                     cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                     default: $giper_baza_link;
-                    check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    check<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     [Symbol.toStringTag]: string;
                     [$mol_key_handle](): string;
-                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                    [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value>(this: This, value: Value): value is Value & This["default"];
                     getPrototypeOf(o: any): any;
                     getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                     getOwnPropertyNames(o: any): string[];
@@ -37618,13 +41588,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -37680,13 +41650,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -37776,13 +41746,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value>(value: Value): Value & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
@@ -37995,13 +41965,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -38057,13 +42027,13 @@ declare namespace $ {
                             };
                             Class: Init;
                             toString(): string;
-                            guard<Value>(value: Value): Value & InstanceType<Init>;
+                            guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                             cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                             default: InstanceType<Init>;
-                            check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                            check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                             [Symbol.toStringTag]: string;
                             [$mol_key_handle](): string;
-                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                            [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                             getPrototypeOf(o: any): any;
                             getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                             getOwnPropertyNames(o: any): string[];
@@ -38153,13 +42123,13 @@ declare namespace $ {
                         };
                         Class: Init;
                         toString(): string;
-                        guard<Value>(value: Value): Value & InstanceType<Init>;
+                        guard<This extends typeof $mol_schema_any, Value>(this: This, value: Value): Value & This["default"];
                         cast<This extends typeof $mol_schema_any>(this: This, value: unknown): This["default"];
                         default: InstanceType<Init>;
-                        check<This extends typeof $mol_schema_any, Val>(this: This, val: Val): val is Val & This["default"];
+                        check<This extends typeof $mol_schema_any, Value_1>(this: This, value: Value_1): value is Value_1 & This["default"];
                         [Symbol.toStringTag]: string;
                         [$mol_key_handle](): string;
-                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Val_1>(this: This, val: Val_1): val is Val_1 & This["default"];
+                        [Symbol.hasInstance]<This extends typeof $mol_schema_any, Value_2>(this: This, value: Value_2): value is Value_2 & This["default"];
                         getPrototypeOf(o: any): any;
                         getOwnPropertyDescriptor(o: any, p: PropertyKey): PropertyDescriptor | undefined;
                         getOwnPropertyNames(o: any): string[];
